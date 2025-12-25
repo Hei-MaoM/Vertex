@@ -25,5 +25,7 @@ redis:
 
 email:
   smtp_host: "smtp.qq.com"
+  smtp_port: 456
   smtp_email: "2847944739@qq.com"
   smtp_pass: "xaystzrlzsaudcic"
+  from_name: "HMM"

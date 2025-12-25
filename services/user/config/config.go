@@ -15,11 +15,11 @@ type ServerConfig struct {
 	ServiceName string `mapstructure:"service_name"`
 }
 type MySQLConfig struct {
-	DbHost string `mapstructure:"db_host"`
-	DbPort string `mapstructure:"db_port"`
-	DbUser string `mapstructure:"db_user"`
-	DbPass string `mapstructure:"db_pass"`
-	DbName string `mapstructure:"db_name"`
+	DbHost     string `mapstructure:"db_host"`
+	DbPort     string `mapstructure:"db_port"`
+	DbUser     string `mapstructure:"db_user"`
+	DbPassword string `mapstructure:"db_password"`
+	DbName     string `mapstructure:"db_name"`
 }
 type RedisConfig struct {
 	Addr     string `mapstructure:"addr"`
@@ -31,20 +31,22 @@ type EmailConfig struct {
 	SmtpHost  string `mapstructure:"smtp_host"`
 	SmtpEmail string `mapstructure:"smtp_email"`
 	SmtpPass  string `mapstructure:"smtp_pass"`
+	SmtpPort  int    `mapstructure:"smtp_port"`
+	FromName  string `mapstructure:"from_name"`
 }
 
-var con = new(Config)
+var Con = new(Config)
 
 func Init() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	//以防止找不到配置文件，可以多添加几个搜索路径
 	viper.AddConfigPath(".")
-	viper.AddConfigPath("../../services/user/config")
+	viper.AddConfigPath("./services/user/config")
 	if err := viper.ReadInConfig(); err != nil {
 		panic(err)
 	}
-	if err := viper.Unmarshal(&con); err != nil {
+	if err := viper.Unmarshal(&Con); err != nil {
 		panic(err)
 	}
 }
