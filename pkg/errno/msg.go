@@ -6,6 +6,8 @@ var MsgFlags = map[int]string{
 	ErrorTokenEmpty:            "Token为空",
 	ErrorAuthCheckTokenTimeout: "Token过期",
 	ErrorAuthToken:             "Token认证失败",
+	ErrorParameter:             "参数错误",
+	ErrorSendEmail:             "邮件发送失败",
 }
 
 func GetMsg(code int) string {

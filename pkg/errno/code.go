@@ -7,4 +7,6 @@ const (
 	ErrorTokenEmpty            = 20001
 	ErrorAuthCheckTokenTimeout = 20002
 	ErrorAuthToken             = 20003
+	ErrorParameter             = 20004
+	ErrorSendEmail             = 20005
 )

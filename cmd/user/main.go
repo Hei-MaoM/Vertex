@@ -4,6 +4,7 @@ import (
 	"Vertex/pkg/database"
 	"Vertex/services/user/config"
 	"Vertex/services/user/dao"
+	"Vertex/services/user/router"
 	"fmt"
 )
 
@@ -17,5 +18,6 @@ func main() {
 	database.InitRedis(r.Addr, r.Password, r.DB)
 	dao.Init()
 	fmt.Println("User service initialized successfully")
-	select {}
+	re := router.NewRouter()
+	re.Run(config.Con.Server.HttpPort)
 }
