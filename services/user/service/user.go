@@ -5,8 +5,11 @@ import (
 	email2 "Vertex/pkg/email"
 	"Vertex/pkg/errno"
 	"Vertex/pkg/serializer"
+	"Vertex/pkg/util"
 	"Vertex/services/user/config"
-	//"Vertex/services/user/model"
+	"Vertex/services/user/dao"
+	"Vertex/services/user/model"
+	serial "Vertex/services/user/serializer"
 	"context"
 	"fmt"
 	"time"
@@ -16,6 +19,7 @@ type UserService struct {
 	UserName string `form:"user_name" json:"user_name" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
 	Email    string `form:"email" json:"email" binding:"required"`
+	Code     string `form:"code" json:"code"`
 }
 
 type SendEmailService struct {
@@ -24,9 +28,10 @@ type SendEmailService struct {
 	//1.绑定邮箱 2.解绑邮箱 3.改密码
 }
 
+// SendEmail 发送邮箱验证码
 func (service *SendEmailService) SendEmail(ctx context.Context) serializer.Response {
 	code := errno.Success
-	if service.Email == "" {
+	if service.Email == "" || service.OperationType == 0 {
 		code = errno.ErrorParameter
 		return serializer.Response{
 			Status: code,
@@ -88,4 +93,107 @@ func (service *SendEmailService) SendEmail(ctx context.Context) serializer.Respo
 		Msg:    "验证码发送成功",
 	}
 
+}
+
+// Register 用户注册
+func (service *UserService) Register(ctx context.Context) serializer.Response {
+	code := errno.Success
+	userdao := dao.NewUserDao(ctx)
+	if service.Email == "" || service.Password == "" || service.UserName == "" || service.Code == "" {
+		code = errno.ErrorParameter
+		return serializer.Response{
+			Status: code,
+			Msg:    errno.GetMsg(code),
+			Error:  "参数有错",
+		}
+	}
+	if len(service.Password) < 6 {
+		code = errno.ErrorParameter
+		return serializer.Response{
+
+			Status: code,
+			Msg:    "密码长度不能少于6位",
+		}
+	}
+	fmt.Println(database.RDB.Get(ctx, fmt.Sprintf("Vertex:Email:Type:%s", service.Email)).Val())
+	if dao.CheckEmailCode(ctx, service.Email, service.Code) == false || dao.TypeConfirmation(ctx, service.Email, "1") == false {
+		code = errno.ErrorCodeInvalid
+		return serializer.Response{
+			Status: code,
+			Msg:    errno.GetMsg(code),
+			Error:  "验证码错误或已过期",
+		}
+	}
+	val, err := userdao.ExistOrNotByEmail(service.Email)
+	if err != nil {
+		code = errno.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    errno.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	if val {
+		code = errno.ErrorEmailExist
+		return serializer.Response{
+			Status: code,
+			Msg:    errno.GetMsg(code),
+			Error:  "邮箱已被注册",
+		}
+	}
+	val, err = userdao.ExistOrNotByUserName(service.UserName)
+	if err != nil {
+		code = errno.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    errno.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	if val {
+		code = errno.ErrorEmailExist
+		return serializer.Response{
+			Status: code,
+			Msg:    errno.GetMsg(code),
+			Error:  "用户名已被注册",
+		}
+	}
+
+	password, err := util.HashPassword(service.Password)
+	if err != nil {
+		code = errno.Error
+		return serializer.Response{
+			Status: code,
+			Msg:    errno.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	user := model.User{
+		UserName:  service.UserName,
+		Email:     service.Email,
+		Password:  password,
+		Avatar:    "",
+		Status:    1,
+		Authority: 1,
+	}
+	err = userdao.Create(&user).Error
+	if err != nil {
+		code = errno.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    errno.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	limitKey := fmt.Sprintf("Vertex:Email:Limit:%s", service.Email)
+	AuthEmail := fmt.Sprintf("Vertex:Email:Auth:%s", service.Email)
+	TypeEmail := fmt.Sprintf("Vertex:Email:Type:%s", service.Email)
+	_ = util.DeleteVal(ctx, limitKey)
+	_ = util.DeleteVal(ctx, AuthEmail)
+	_ = util.DeleteVal(ctx, TypeEmail)
+	return serializer.Response{
+		Status: code,
+		Msg:    "注册成功",
+		Data:   serial.BuildUser(&user),
+	}
 }

@@ -25,7 +25,7 @@ func GenerateToken(id uint, userName string, authority int) (string, error) {
 		Authority: authority,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
-			Issuer:    "FanOne-Mall",
+			Issuer:    "HeiMaoM",
 		},
 	}
 	tokeClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -65,7 +65,7 @@ func GenerateEmailToken(userId, Operation uint, email, password string) (string,
 		OperationType: Operation,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
-			Issuer:    "FanOne-Mall",
+			Issuer:    "HeiMaoM",
 		},
 	}
 	tokeClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

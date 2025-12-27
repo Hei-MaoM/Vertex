@@ -9,4 +9,9 @@ const (
 	ErrorAuthToken             = 20003
 	ErrorParameter             = 20004
 	ErrorSendEmail             = 20005
+	ErrorEmailExist            = 20006
+	ErrorNameExist             = 20007
+	ErrorCodeInvalid           = 20008
+	//数据库错误
+	ErrorDatabase = 30001
 )

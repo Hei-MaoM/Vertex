@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"log"
 	"os"
 	"time"
@@ -46,4 +47,8 @@ func InitMysql(dsn string) {
 	sqlDB.SetMaxOpenConns(100) //打开连接数
 	sqlDB.SetConnMaxLifetime(time.Second * 600)
 
+}
+func NewDBClient(ctx context.Context) *gorm.DB {
+	db := DB
+	return db.WithContext(ctx)
 }

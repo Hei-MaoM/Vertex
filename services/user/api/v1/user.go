@@ -17,3 +17,13 @@ func SendEmail(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errno.ErrrResponse(err))
 	}
 }
+
+func UserRegister(c *gin.Context) {
+	var user service.UserService
+	if err := c.ShouldBind(&user); err == nil {
+		res := user.Register(c.Request.Context())
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, errno.ErrrResponse(err))
+	}
+}
