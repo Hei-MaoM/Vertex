@@ -31,7 +31,6 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(req *types.RegisterReq) (resp *types.RegisterResp, err error) {
-	// todo: add your logic here and delete this line
 	authKey := fmt.Sprintf("Vertex:Email:Auth:%s", req.Email)
 	code, err := l.svcCtx.Redis.Get(authKey)
 	if err != nil || code != req.Code {

@@ -31,7 +31,6 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
-	// todo: add your logic here and delete this line
 	code := errno.Success
 	fmt.Println(req.UserName)
 	if req.UserName == "" || req.Password == "" {

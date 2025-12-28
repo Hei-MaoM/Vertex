@@ -29,7 +29,6 @@ func NewSendEmailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendEma
 }
 
 func (l *SendEmailLogic) SendEmail(req *types.SendEmailReq) (resp *types.CommonResp, err error) {
-	// todo: add your logic here and delete this line
 	limitKey := fmt.Sprintf("Vertex:Email:Limit:%s", req.Email)
 	exist, _ := l.svcCtx.Redis.Exists(limitKey)
 	if exist {

@@ -17,7 +17,6 @@ func NewAdminCheckMiddleware() *AdminCheckMiddleware {
 
 func (m *AdminCheckMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// TODO generate middleware implement function, delete after code implementation
 		authVal := r.Context().Value("authority")
 		if authVal == nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
