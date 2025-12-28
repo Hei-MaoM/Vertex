@@ -4,15 +4,15 @@
 package logic
 
 import (
-	"Vertex/app/user/api/internal/config"
 	"Vertex/pkg/errno"
 	"Vertex/pkg/util"
+	"Vertex/user/api/internal/config"
 	"context"
 	"fmt"
 	"time"
 
-	"Vertex/app/user/api/internal/svc"
-	"Vertex/app/user/api/internal/types"
+	"Vertex/user/api/internal/svc"
+	"Vertex/user/api/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

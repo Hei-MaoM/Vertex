@@ -4,9 +4,9 @@
 package svc
 
 import (
-	"Vertex/app/user/api/app/user/model"
-	"Vertex/app/user/api/internal/config"
 	"Vertex/pkg/email"
+	"Vertex/user/api/app/user/model"
+	"Vertex/user/api/internal/config"
 
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"

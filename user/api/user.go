@@ -7,9 +7,9 @@ import (
 	"flag"
 	"fmt"
 
-	"Vertex/app/user/api/internal/config"
-	"Vertex/app/user/api/internal/handler"
-	"Vertex/app/user/api/internal/svc"
+	"Vertex/user/api/internal/config"
+	"Vertex/user/api/internal/handler"
+	"Vertex/user/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"

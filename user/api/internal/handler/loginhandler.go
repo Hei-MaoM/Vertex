@@ -6,9 +6,9 @@ package handler
 import (
 	"net/http"
 
-	"Vertex/app/user/api/internal/logic"
-	"Vertex/app/user/api/internal/svc"
-	"Vertex/app/user/api/internal/types"
+	"Vertex/user/api/internal/logic"
+	"Vertex/user/api/internal/svc"
+	"Vertex/user/api/internal/types"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
