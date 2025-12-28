@@ -24,8 +24,8 @@ type Config struct {
 	}
 	CacheRedis cache.CacheConf
 	Auth       struct {
-		accessSecret string
-		accessExpire int64
+		AccessSecret string
+		AccessExpire int64
 	}
 }
 

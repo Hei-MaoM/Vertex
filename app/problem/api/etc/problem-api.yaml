@@ -12,7 +12,7 @@ Redis:
 
 Auth:
   AccessSecret: "hmmuasiydigxzyudt17146syafd6h321fd"
-  AccessExpire:  "86400"
+  AccessExpire: "86400"
 CacheRedis:
   - Host: 127.0.0.1:6379
     Pass: ""
