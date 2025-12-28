@@ -12,6 +12,9 @@ const (
 	ErrorEmailExist            = 20006
 	ErrorNameExist             = 20007
 	ErrorCodeInvalid           = 20008
+	ErrorPasswordIncorrect     = 20009
+	ErrorTokenGenerate         = 20010
+	ErrorUserNotFound          = 20011
 	//数据库错误
 	ErrorDatabase = 30001
 )

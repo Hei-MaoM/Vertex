@@ -12,6 +12,9 @@ var MsgFlags = map[int]string{
 	ErrorEmailExist:            "邮箱已存在",
 	ErrorNameExist:             "用户名已存在",
 	ErrorCodeInvalid:           "验证码无效",
+	ErrorPasswordIncorrect:     "密码错误",
+	ErrorTokenGenerate:         "token生成失败",
+	ErrorUserNotFound:          "用户不存在",
 }
 
 func GetMsg(code int) string {

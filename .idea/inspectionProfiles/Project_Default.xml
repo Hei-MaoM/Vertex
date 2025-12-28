@@ -4,6 +4,7 @@
     <inspection_tool class="GoDfaErrorMayBeNotNil" enabled="true" level="WARNING" enabled_by_default="true">
       <methods>
         <method importPath="gorm.io/gorm" receiver="*DB" name="DB" />
+        <method importPath="Vertex/app/user/api/app/user/model" receiver="UsersModel" name="FindOneByUsername" />
       </methods>
     </inspection_tool>
   </profile>
