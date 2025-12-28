@@ -23,6 +23,10 @@ type Config struct {
 		FromName  string
 	}
 	CacheRedis cache.CacheConf
+	Auth       struct {
+		accessSecret string
+		accessExpire int64
+	}
 }
 
 const EmailTemplate = `
@@ -51,4 +55,6 @@ const EmailTemplate = `
     </div>
 </div>
 `
+
+// token过期时间
 const TokenExpireDuration = 24

@@ -1,0 +1,65 @@
+syntax = "v1"
+
+info (
+	title:   "Vertex User Service"
+	desc:    "题目"
+	author:  "HeiMaoM"
+	Version: "v1"
+)
+
+type CommonResp {
+	Status int32       `json:"status"`
+	Msg    string      `json:"msg"`
+	Error  string      `json:"error",omitempty`
+	Data   interface{} `json:"data",omitempty`
+}
+
+type PublishReq {
+	ProblemUrl    string  `json:"problem_url"`
+	ProblemTitle  string  `json:"problem_title"`
+	ProblemSource string  `json:"problem_source"`
+	TagIds        []int64 `json:"tag_ids"`
+	Title         string  `json:"title"`
+	Content       string  `json:"content"`
+	Solution      string  `json:"solution"`
+}
+
+type AuditReq {
+	PostId          int64  `json:"post_id"`
+	Status          int32  `json:"status"` // 1=通过 2=拒绝
+	FixProblemTitle string `json:"fix_problem_title"`
+}
+
+type Tag {
+	Id       int64  `json:"id"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
+}
+
+type TagListResp {
+	Status int32  `json:"status"`
+	Msg    string `json:"msg"`
+	Error  string `json:"error",omitempty`
+	Data   []Tag  `json:"data",omitempty`
+}
+
+@server (
+	jwt: Auth
+)
+service problem-api {
+	@handler Publish
+	post /v1/problem/publish (PublishReq) returns (CommonResp) // 发布题目
+
+	@handler TagList
+	get /v1/problem/tags returns (TagListResp) // 获取题目标签列表
+}
+
+@server (
+	jwt:        Auth
+	middleware: AdminCheck
+)
+service problem-api {
+	@handler Audit
+	post /v1/problem/audit (AuditReq) returns (CommonResp) // 审核题目
+}
+

@@ -18,12 +18,12 @@ type LoginReq struct {
 type LoginResp struct {
 	Status int32        `json:"status"`
 	Msg    string       `json:"msg"`
-	Error string       `json:"error",omitempty`
-	Data  TokenPayload `json:"data",omitempty`
+	Error  string       `json:"error",omitempty`
+	Data   TokenPayload `json:"data",omitempty`
 }
 
 type RegisterReq struct {
-	UserName string `json:"user_name" form:"user_name"`
+	UserName string `json:"user_name"  `
 	Password string `json:"password" form:"password"`
 	Email    string `json:"email" form:"email"`
 	Code     string `json:"code" form:"code"`
@@ -32,8 +32,8 @@ type RegisterReq struct {
 type RegisterResp struct {
 	Status int32  `json:"status"`
 	Msg    string `json:"msg"`
-	Error string `json:"error",omitempty`
-	Data  User   `json:"data",omitempty`
+	Error  string `json:"error",omitempty`
+	Data   User   `json:"data",omitempty`
 }
 
 type SendEmailReq struct {
@@ -43,8 +43,8 @@ type SendEmailReq struct {
 
 type TokenPayload struct {
 	Token     string `json:"token"`
-	ExpiresIn int64 `json:"expires_in"`
-	User      User  `json:"user"`
+	ExpiresIn int64  `json:"expires_in"`
+	User      User   `json:"user"`
 }
 
 type User struct {

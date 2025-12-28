@@ -6,23 +6,22 @@ package handler
 import (
 	"net/http"
 
-	"Vertex/user/api/internal/logic"
-	"Vertex/user/api/internal/svc"
-	"Vertex/user/api/internal/types"
-
+	"Vertex/app/problem/api/internal/logic"
+	"Vertex/app/problem/api/internal/svc"
+	"Vertex/app/problem/api/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func SendEmailHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func PublishHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.SendEmailReq
-		if err := httpx.ParseJsonBody(r, &req); err != nil {
+		var req types.PublishReq
+		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := logic.NewSendEmailLogic(r.Context(), svcCtx)
-		resp, err := l.SendEmail(&req)
+		l := logic.NewPublishLogic(r.Context(), svcCtx)
+		resp, err := l.Publish(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

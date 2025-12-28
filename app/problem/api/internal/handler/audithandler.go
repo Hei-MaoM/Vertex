@@ -6,23 +6,22 @@ package handler
 import (
 	"net/http"
 
-	"Vertex/user/api/internal/logic"
-	"Vertex/user/api/internal/svc"
-	"Vertex/user/api/internal/types"
-
+	"Vertex/app/problem/api/internal/logic"
+	"Vertex/app/problem/api/internal/svc"
+	"Vertex/app/problem/api/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func LoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func AuditHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.LoginReq
-		if err := httpx.ParseJsonBody(r, &req); err != nil {
+		var req types.AuditReq
+		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := logic.NewLoginLogic(r.Context(), svcCtx)
-		resp, err := l.Login(&req)
+		l := logic.NewAuditLogic(r.Context(), svcCtx)
+		resp, err := l.Audit(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

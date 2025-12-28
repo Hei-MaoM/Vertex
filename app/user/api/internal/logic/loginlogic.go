@@ -59,7 +59,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 			Error:  "密码错误",
 		}, nil
 	}
-	token, err := util.GenerateToken(uint(user.Id), user.Username, int(user.Authority))
+	token, err := util.GenerateToken(uint(user.Id), user.Username, int(user.Authority), l.svcCtx.Config.Auth.accessSecret, l.svcCtx.Config.Auth.accessExpire)
 	if err != nil {
 		code = errno.ErrorTokenGenerate
 		return &types.LoginResp{

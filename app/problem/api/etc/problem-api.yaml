@@ -1,0 +1,19 @@
+Name: problem-api
+Host: 0.0.0.0
+Port: 8082
+Mysql:
+  # 格式: user:password@tcp(host:port)/dbname?charset=...
+  DataSource: root:root@tcp(127.0.0.1:3306)/user_db?charset=utf8mb4&parseTime=true&loc=Local
+
+Redis:
+  Host: 127.0.0.1:6379
+  # Password: "" # 如果没有密码可以注释掉
+  Type: node     # 单机模式
+
+Auth:
+  AccessSecret: "hmmuasiydigxzyudt17146syafd6h321fd"
+  AccessExpire:  "86400"
+CacheRedis:
+  - Host: 127.0.0.1:6379
+    Pass: ""
+    Type: node

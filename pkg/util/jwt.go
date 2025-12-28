@@ -16,9 +16,9 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func GenerateToken(id uint, userName string, authority int) (string, error) {
+func GenerateToken(id uint, userName string, authority int, secret string, expireSecond int64) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(24 * time.Hour)
+	expireTime := nowTime.Add(time.Duration(expireSecond) * time.Second)
 	claims := Claims{
 		ID:        id,
 		UserName:  userName,
@@ -29,58 +29,6 @@ func GenerateToken(id uint, userName string, authority int) (string, error) {
 		},
 	}
 	tokeClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokeClaims.SignedString(jwtSecret)
+	token, err := tokeClaims.SignedString(secret)
 	return token, err
-}
-
-// 验证token
-func ParseToken(token string) (*Claims, error) {
-	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
-	if tokenClaims != nil {
-		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
-			return claims, nil
-		}
-	}
-	return nil, err
-}
-
-type EmailClaims struct {
-	UserId        uint   `json:"user_id"`
-	Email         string `json:"email"`
-	Password      string `json:"password"`
-	OperationType uint   `json:"operation_type"`
-	jwt.StandardClaims
-}
-
-// GenerateEmailToken 签发email的token
-func GenerateEmailToken(userId, Operation uint, email, password string) (string, error) {
-	nowTime := time.Now()
-	expireTime := nowTime.Add(24 * time.Hour)
-	claims := EmailClaims{
-		UserId:        userId,
-		Email:         email,
-		Password:      password,
-		OperationType: Operation,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expireTime.Unix(),
-			Issuer:    "HeiMaoM",
-		},
-	}
-	tokeClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokeClaims.SignedString(jwtSecret)
-	return token, err
-}
-
-func ParseEmailToken(token string) (*EmailClaims, error) {
-	tokenClaims, err := jwt.ParseWithClaims(token, &EmailClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
-	if tokenClaims != nil {
-		if claims, ok := tokenClaims.Claims.(*EmailClaims); ok && tokenClaims.Valid {
-			return claims, nil
-		}
-	}
-	return nil, err
 }

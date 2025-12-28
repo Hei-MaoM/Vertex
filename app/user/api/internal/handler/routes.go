@@ -4,8 +4,9 @@
 package handler
 
 import (
-	"Vertex/app/user/api/internal/svc"
 	"net/http"
+
+	"Vertex/app/user/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
