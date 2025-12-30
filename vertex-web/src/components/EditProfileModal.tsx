@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { X, Upload, Loader2, User as UserIcon } from 'lucide-react';
-import { userApi } from '../lib/api';
-import { uploadToQiniu } from '../lib/upload';
+import React, {useState} from 'react';
+import {Loader2, Upload, User as UserIcon, X} from 'lucide-react';
+import {userApi} from '../lib/api';
+import {uploadToQiniu} from '../lib/upload';
 import type {CommonResp} from '../types';
 
 interface EditProfileModalProps {
@@ -11,7 +11,7 @@ interface EditProfileModalProps {
     currentUser: { username: string; avatar: string }; // 传入当前信息用于回显
 }
 
-export const EditProfileModal = ({ isOpen, onClose, onSuccess, currentUser }: EditProfileModalProps) => {
+export const EditProfileModal = ({isOpen, onClose, onSuccess, currentUser}: EditProfileModalProps) => {
     const [nickname, setNickname] = useState(currentUser.username);
     const [avatarUrl, setAvatarUrl] = useState(currentUser.avatar);
     const [loading, setLoading] = useState(false);
@@ -64,7 +64,7 @@ export const EditProfileModal = ({ isOpen, onClose, onSuccess, currentUser }: Ed
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                    <X size={20} />
+                    <X size={20}/>
                 </button>
                 <h2 className="text-xl font-bold mb-6 text-gray-800">编辑个人资料</h2>
 
@@ -77,9 +77,10 @@ export const EditProfileModal = ({ isOpen, onClose, onSuccess, currentUser }: Ed
                                 alt="Avatar"
                                 className="w-24 h-24 rounded-full border-4 border-gray-100 object-cover"
                             />
-                            <label className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition">
-                                <Upload className="text-white" size={24} />
-                                <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                            <label
+                                className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition">
+                                <Upload className="text-white" size={24}/>
+                                <input type="file" className="hidden" accept="image/*" onChange={handleFileChange}/>
                             </label>
                         </div>
                         <p className="text-xs text-gray-400">点击头像上传新图片</p>
@@ -89,7 +90,7 @@ export const EditProfileModal = ({ isOpen, onClose, onSuccess, currentUser }: Ed
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">昵称</label>
                         <div className="relative">
-                            <UserIcon className="absolute left-3 top-3 text-gray-400" size={18} />
+                            <UserIcon className="absolute left-3 top-3 text-gray-400" size={18}/>
                             <input
                                 type="text"
                                 value={nickname}
@@ -104,7 +105,7 @@ export const EditProfileModal = ({ isOpen, onClose, onSuccess, currentUser }: Ed
                         disabled={loading}
                         className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 flex justify-center items-center gap-2"
                     >
-                        {loading && <Loader2 className="animate-spin" size={18} />}
+                        {loading && <Loader2 className="animate-spin" size={18}/>}
                         保存修改
                     </button>
                 </div>

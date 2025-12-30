@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { userApi } from './api';
+import {userApi} from './api';
 import type {CommonResp, UploadTokenResp} from '../types';
 
 /**
@@ -16,7 +16,7 @@ export const uploadToQiniu = async (file: File): Promise<string> => {
         throw new Error(res.data.msg || "获取上传凭证失败");
     }
 
-    const { token, domain } = res.data.data;
+    const {token, domain} = res.data.data;
 
     // 2. 构建表单数据
     const formData = new FormData();
@@ -29,7 +29,7 @@ export const uploadToQiniu = async (file: File): Promise<string> => {
     // 3. 发送给七牛云 (华东区: upload.qiniup.com, 北美: upload-na0.qiniup.com)
     // 如果不确定区域，可以用 upload.qiniup.com 让它自动调度，或者看你后端配置
     const qiniuRes = await axios.post('https://up-na0.qiniup.com', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: {'Content-Type': 'multipart/form-data'}
     });
 
     // 4. 拼接 URL
