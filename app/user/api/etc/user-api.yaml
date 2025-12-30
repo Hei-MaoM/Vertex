@@ -5,6 +5,18 @@ Name: user-api
 Host: 0.0.0.0
 Port: 8081        # 对应你原来的 http_port
 Mode: dev         # 对应你原来的 app_mode (dev, test, rt, pro)
+Cors:
+  AllowOrigins:
+    - "*" # 允许所有域名访问，或者指定 "http://localhost:5173"
+  AllowMethods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+  AllowHeaders:
+    - "Content-Type"
+    - "Authorization" # 允许带 Token
 
 # ==============================
 #  MySQL (推荐合成一个连接串)
@@ -36,4 +48,10 @@ CacheRedis:
     Type: node
 Auth:
   AccessSecret: "hmmuasiydigxzyudt17146syafd6h321fd"
-  AccessExpire: "86400"
+  AccessExpire: 86400
+qiniu:
+  Zone: "na0"
+  Bucket: "hmm2"
+  AccessKey: "KPERSwMa2ecRPdav-_ceivzoOuT9zpeCJBCvs2VC"
+  SecretKey: "93QS-uoCs9Zggbe5uuujfMjUHJ6-BPmdAemE48LS"
+  Domain: "http://t82z74lni.bkt.gdipper.com"

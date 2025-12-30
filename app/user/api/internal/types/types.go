@@ -41,10 +41,57 @@ type SendEmailReq struct {
 	OperationType int32  `json:"operation_type" form:"operation_type"` // 1=注册 2=换绑 3=修改密码
 }
 
+type SetAuthorityReq struct {
+	Id        int64 `json:"id"`
+	Authority int64 `json:"authority"`
+}
+
+type SetAuthorityResp struct {
+	Status int32  `json:"status"`
+	Msg    string `json:"msg"`
+	Error  string `json:"error",omitempty`
+	Data   string `json:"data",omitempty`
+}
+
+type SetStatusReq struct {
+	Id     int64 `json:"id"`
+	Status int64 `json:"status"`
+}
+
+type SetStatusResp struct {
+	Status int32  `json:"status"`
+	Msg    string `json:"msg"`
+	Error  string `json:"error",omitempty`
+	Data   string `json:"data",omitempty`
+}
+
 type TokenPayload struct {
 	Token     string `json:"token"`
 	ExpiresIn int64  `json:"expires_in"`
 	User      User   `json:"user"`
+}
+
+type UpToken struct {
+	Token  string `json:"token",`
+	Domain string `json:"domain"`
+}
+
+type UpdateInfoReq struct {
+	Avatar string `json:"avatar"`
+}
+
+type UpdateInfoResp struct {
+	Status int32  `json:"status"`
+	Msg    string `json:"msg"`
+	Error  string `json:"error",omitempty`
+	Data   string `json:"data",omitempty`
+}
+
+type UpdateTokenResp struct {
+	Status int32   `json:"status"`
+	Msg    string  `json:"msg"`
+	Error  string  `json:"error",omitempty`
+	Data   UpToken `json:"data",omitempty`
 }
 
 type User struct {
@@ -55,4 +102,25 @@ type User struct {
 	Status    int32  `json:"status"`
 	Authority int32  `json:"authority"`
 	CreatedAt string `json:"created_at"`
+}
+
+type UserInfo struct {
+	Id        int64  `json:"id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Authority int64  `json:"authority"`
+	Status    int64  `json:"status"`
+	Avatar    string `json:"avatar"`
+	CreatedAt string `json:"created_at"`
+}
+
+type UserInfoReq struct {
+	Id int64 `json:"id"`
+}
+
+type UserInfoResp struct {
+	Status int32    `json:"status"`
+	Msg    string   `json:"msg"`
+	Error  string   `json:"error",omitempty`
+	Data   UserInfo `json:"data",omitempty`
 }

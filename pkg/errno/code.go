@@ -15,6 +15,7 @@ const (
 	ErrorPasswordIncorrect     = 20009
 	ErrorTokenGenerate         = 20010
 	ErrorUserNotFound          = 20011
+	ErrorAuth                  = 20012
 	//数据库错误
 	ErrorDatabase = 30001
 )

@@ -59,6 +59,8 @@ func (l *RegisterLogic) Register(req *types.RegisterReq) (resp *types.RegisterRe
 		Avatar:    "",
 		Authority: 1,
 		Status:    1,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	res, err := l.svcCtx.UserModel.Insert(l.ctx, newUser)
 	if err != nil {

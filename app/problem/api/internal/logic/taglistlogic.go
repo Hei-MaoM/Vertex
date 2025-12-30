@@ -4,6 +4,7 @@
 package logic
 
 import (
+	"Vertex/pkg/errno"
 	"context"
 
 	"Vertex/app/problem/api/internal/svc"
@@ -27,7 +28,25 @@ func NewTagListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TagListLo
 }
 
 func (l *TagListLogic) TagList() (resp *types.TagListResp, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	tagList, err := l.svcCtx.TagModel.FindAll(l.ctx)
+	if err != nil {
+		return &types.TagListResp{
+			Status: errno.ErrorDatabase,
+			Msg:    errno.GetMsg(errno.ErrorDatabase),
+			Error:  err.Error(),
+		}, nil
+	}
+	res := make([]types.Tag, 0)
+	for i := 0; i < len(tagList); i++ {
+		res = append(res, types.Tag{
+			Id:       int64(tagList[i].Id),
+			Name:     tagList[i].Name,
+			Category: tagList[i].Category,
+		})
+	}
+	return &types.TagListResp{
+		Status: errno.Success,
+		Msg:    errno.GetMsg(errno.Success),
+		Data:   res,
+	}, nil
 }

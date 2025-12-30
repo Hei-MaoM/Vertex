@@ -1,6 +1,9 @@
 package model
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
@@ -12,6 +15,7 @@ type (
 	// and implement the added methods in customTagModel.
 	TagModel interface {
 		tagModel
+		FindAll(ctx context.Context) ([]*Tag, error)
 	}
 
 	customTagModel struct {
@@ -24,4 +28,10 @@ func NewTagModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Option) Tag
 	return &customTagModel{
 		defaultTagModel: newTagModel(conn, c, opts...),
 	}
+}
+func (m *customTagModel) FindAll(ctx context.Context) ([]*Tag, error) {
+	var tags []*Tag
+	query := fmt.Sprintf("SELECT %s FROM %s ORDER BY category, id", tagRows, m.table)
+	err := m.QueryRowsNoCacheCtx(ctx, &tags, query)
+	return tags, err
 }

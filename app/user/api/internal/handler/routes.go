@@ -29,6 +29,60 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/v1/user/send_email",
 				Handler: SendEmailHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/user/showinfo",
+				Handler: ShowInfoHandler(serverCtx),
+			},
 		},
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.SuperAdminCheck},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/v1/user/setauthority",
+					Handler: SetAuthorityHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AdminCheck},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/v1/user/setstatus",
+					Handler: SetStatusHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/v1/user/myinfo",
+				Handler: ShowMyInfoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/v1/user/updateinfo",
+				Handler: UpdateInfoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/user/updatetoken",
+				Handler: UpdateTokenHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
 }

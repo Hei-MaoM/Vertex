@@ -16,6 +16,29 @@ type CommonResp struct {
 	Data   interface{} `json:"data",omitempty`
 }
 
+type ListReq struct {
+	Page     int64  `json:"page,default=1"`       // 当前页码
+	PageSize int64  `json:"page_size,default=20"` // 每页显示数量
+	Keyword  string `json:"keyword,optional"`     // 搜索关键词 (标题/来源)
+	TagId    int64  `json:"tag_id,optional"`      // 按标签筛选 (0表示全部)
+}
+
+type ListResp struct {
+	Status int32         `json:"status"`
+	Msg    string        `json:"msg"`
+	Error  string        `json:"error",omitempty`
+	Total  int64         `json:"total"`
+	Data   []ProblemPost `json:"data",omitempty`
+}
+
+type ProblemPost struct {
+	Id     int64   `json:"id"`
+	Title  string  `json:"title"`
+	Source string  `json:"source"`
+	Score  float64 `json:"score"`
+	Tags   []Tag   `json:"tags"`
+}
+
 type PublishReq struct {
 	ProblemUrl    string  `json:"problem_url"`
 	ProblemTitle  string  `json:"problem_title"`

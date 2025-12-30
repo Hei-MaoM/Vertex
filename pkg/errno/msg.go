@@ -15,6 +15,7 @@ var MsgFlags = map[int]string{
 	ErrorPasswordIncorrect:     "密码错误",
 	ErrorTokenGenerate:         "token生成失败",
 	ErrorUserNotFound:          "用户不存在",
+	ErrorAuth:                  "jwt密钥出错",
 }
 
 func GetMsg(code int) string {

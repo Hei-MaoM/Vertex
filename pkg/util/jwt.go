@@ -29,6 +29,6 @@ func GenerateToken(id uint, userName string, authority int, secret string, expir
 		},
 	}
 	tokeClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokeClaims.SignedString(secret)
+	token, err := tokeClaims.SignedString([]byte(secret))
 	return token, err
 }

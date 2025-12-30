@@ -27,6 +27,13 @@ type Config struct {
 		AccessSecret string
 		AccessExpire int64
 	}
+	Qiniu struct {
+		AccessKey string
+		SecretKey string
+		Bucket    string
+		Zone      string
+		Domain    string
+	}
 }
 
 const EmailTemplate = `

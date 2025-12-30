@@ -15,6 +15,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				Method:  http.MethodGet,
+				Path:    "/v1/problem/list",
+				Handler: ProblemListHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
 				Method:  http.MethodPost,
 				Path:    "/v1/problem/publish",
 				Handler: PublishHandler(serverCtx),
@@ -36,6 +46,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/v1/problem/audit",
 					Handler: AuditHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/problem/auditlist",
+					Handler: AuditProblemListHandler(serverCtx),
 				},
 			}...,
 		),

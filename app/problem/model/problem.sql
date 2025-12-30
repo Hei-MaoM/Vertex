@@ -27,11 +27,10 @@ CREATE TABLE `problem_post`
     `id`          bigint unsigned NOT NULL AUTO_INCREMENT,
     `problem_id`  bigint unsigned NOT NULL COMMENT '关联 problem.id',
     `user_id`     bigint unsigned NOT NULL COMMENT '关联 users.id',
-
     `title`       varchar(255) NOT NULL DEFAULT '' COMMENT '帖子标题',
     `content`     text         NOT NULL COMMENT '推荐理由/内容',
     `solution`    text         NOT NULL COMMENT '代码/题解',
-    `statys`      tinyint unsigned NOT NULL DEFAULT '0' COMMENT '状态: 0-审核中, 2-以发布, 3-已撤销',
+    `status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '状态: 0-审核中, 1-以发布, 2-已撤销',
     -- 热度数据
     `view_num`    int unsigned NOT NULL DEFAULT '0',
     `collect_num` int unsigned NOT NULL DEFAULT '0',

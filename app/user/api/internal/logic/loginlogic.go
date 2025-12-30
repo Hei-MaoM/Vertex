@@ -32,7 +32,6 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
 	code := errno.Success
-	fmt.Println(req.UserName)
 	if req.UserName == "" || req.Password == "" {
 		code = errno.ErrorParameter
 		return &types.LoginResp{
@@ -42,6 +41,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 		}, nil
 	}
 	user, err := l.svcCtx.UserModel.FindOneByUsername(l.ctx, req.UserName)
+	fmt.Println(user.Authority)
 	if err != nil {
 		code = errno.ErrorUserNotFound
 		return &types.LoginResp{
@@ -59,6 +59,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 		}, nil
 	}
 	token, err := util.GenerateToken(uint(user.Id), user.Username, int(user.Authority), l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire)
+
 	if err != nil {
 		code = errno.ErrorTokenGenerate
 		return &types.LoginResp{
