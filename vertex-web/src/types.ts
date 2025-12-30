@@ -11,7 +11,7 @@ export interface User {
     username: string;
     email: string;
     avatar: string;
-    authority: number;
+    authority: number; // 1=普通, 2=管理员, 3=超管
     status: number;
     created_at: string;
 }
@@ -30,14 +30,27 @@ export interface Tag {
     category: string;
 }
 
-// 题目列表项
+// 题目列表项 (Feed用)
 export interface ProblemPost {
     id: number;
     title: string;
     source: string;
-    score: number;
+    // score: number; // 已删除
     tags: Tag[];
     is_solved: boolean;
+}
+
+// 题目详情 (Modal用)
+export interface ProblemDetail {
+    id: number;
+    problem_id: number;
+    title: string;
+    source: string;
+    content: string;
+    solution: string;
+    is_solved: boolean;
+    problem_url: string;
+    // tags: Tag[]; // 如果后端详情接口没返回 tags，这里就先不写，或者复用列表的 tags
 }
 
 // 列表响应
@@ -53,19 +66,13 @@ export interface AuditReq {
     fix_problem_title?: string;
 }
 
-// === 新增：七牛 Token 响应 ===
+// 七牛 Token
 export interface UploadTokenResp {
     token: string;
     domain: string;
 }
 
-// === 新增：发布题目请求 ===
-export interface PublishReq {
-    problem_url: string;
-    problem_title: string;
-    problem_source: string;
-    tag_ids: number[];
-    title: string;
-    content: string;
-    solution: string;
+// 本地上传响应
+export interface LocalUploadResp {
+    url: string;
 }

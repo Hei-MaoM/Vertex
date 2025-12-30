@@ -1,96 +1,122 @@
 syntax = "v1"
 
-info(
-    title: "Vertex User Service"
-    desc: "题目"
-    author: "HeiMaoM"
-    Version: "v1"
+info (
+	title:   "Vertex User Service"
+	desc:    "题目"
+	author:  "HeiMaoM"
+	Version: "v1"
 )
 
 type CommonResp {
-    Status int32 `json:"status"`
-    Msg string `json:"msg"`
-    Error string `json:"error",omitempty`
-    Data interface{} `json:"data",omitempty`
+	Status int32       `json:"status"`
+	Msg    string      `json:"msg"`
+	Error  string      `json:"error",omitempty`
+	Data   interface{} `json:"data",omitempty`
 }
 
 type PublishReq {
-    ProblemUrl string `json:"problem_url"`
-    ProblemTitle string `json:"problem_title"`
-    ProblemSource string `json:"problem_source"`
-    TagIds []int64 `json:"tag_ids"`
-    Title string `json:"title"`
-    Content string `json:"content"`
-    Solution string `json:"solution"`
+	ProblemUrl    string  `json:"problem_url"`
+	ProblemTitle  string  `json:"problem_title"`
+	ProblemSource string  `json:"problem_source"`
+	TagIds        []int64 `json:"tag_ids"`
+	Title         string  `json:"title"`
+	Content       string  `json:"content"`
+	Solution      string  `json:"solution"`
 }
 
 type AuditReq {
-    PostId int64 `json:"post_id"`
-    Status int32 `json:"status"` // 1=通过 2=拒绝
-    FixProblemTitle string `json:"fix_problem_title"`
+	PostId          int64  `json:"post_id"`
+	Status          int32  `json:"status"` // 1=通过 2=拒绝
+	FixProblemTitle string `json:"fix_problem_title"`
 }
 
 type Tag {
-    Id int64 `json:"id"`
-    Name string `json:"name"`
-    Category string `json:"category"`
+	Id       int64  `json:"id"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
 }
 
 type TagListResp {
-    Status int32 `json:"status"`
-    Msg string `json:"msg"`
-    Error string `json:"error",omitempty`
-    Data []Tag `json:"data",omitempty`
+	Status int32  `json:"status"`
+	Msg    string `json:"msg"`
+	Error  string `json:"error",omitempty`
+	Data   []Tag  `json:"data",omitempty`
 }
 
 type ProblemPost {
-    Id int64 `json:"id"`
-    Title string `json:"title"`
-    Source string `json:"source"`
-    Score float64 `json:"score"`
-    Tags []Tag `json:"tags"`
+	Id     int64   `json:"id"`
+	Title  string  `json:"title"`
+	Source string  `json:"source"`
+	Score  float64 `json:"score"`
+	Tags   []Tag   `json:"tags"`
 }
 
 type ListResp {
-    Status int32 `json:"status"`
-    Msg string `json:"msg"`
-    Error string `json:"error",omitempty`
-    Total int64 `json:"total"`
-    Data []ProblemPost `json:"data",omitempty`
+	Status int32         `json:"status"`
+	Msg    string        `json:"msg"`
+	Error  string        `json:"error",omitempty`
+	Total  int64         `json:"total"`
+	Data   []ProblemPost `json:"data",omitempty`
 }
 
 type ListReq {
-    Page int64 `json:"page,default=1"`           // 当前页码
-    PageSize int64 `json:"page_size,default=20"` // 每页显示数量
-    Keyword string `json:"keyword,optional"`     // 搜索关键词 (标题/来源)
-    TagId int64 `json:"tag_id,optional"`         // 按标签筛选 (0表示全部)
+	Page     int64  `json:"page,default=1"` // 当前页码
+	PageSize int64  `json:"page_size,default=20"` // 每页显示数量
+	Keyword  string `json:"keyword,optional"` // 搜索关键词 (标题/来源)
+	TagId    int64  `json:"tag_id,optional"` // 按标签筛选 (0表示全部)
+}
+
+type GetProblemDetailReq {
+	Id int64 `form:"id"`
+}
+
+type ProblemDetail {
+	Id         int64  `json:"id"`
+	ProblemId  int64  `json:"problem_id"` // 关联的原始题目ID
+	Title      string `json:"title"`
+	Content    string `json:"content"` // 帖子内容
+	Solution   string `json:"solution"` // 代码/题解
+	Source     string `json:"source"`
+	IsSolved   bool   `json:"is_solved"` // 当前用户是否已打卡该题
+	ProblemUrl string `json:"problem_url"` // 原题链接 (需要关联查 problem 表)
+}
+
+type GetProblemDetailResp {
+	Status int32         `json:"status"`
+	Msg    string        `json:"msg"`
+	Error  string        `json:"error",omitempty`
+	Total  int64         `json:"total"`
+	Data   ProblemDetail `json:"data",omitempty`
 }
 
 service problem-api {
-    @handler ProblemList
-    get /v1/problem/list (ListReq) returns (ListResp)
+	@handler ProblemList
+	get /v1/problem/list (ListReq) returns (ListResp)
 }
 
-@server(
-    jwt: Auth
+@server (
+	jwt: Auth
 )
 service problem-api {
-    @handler Publish
-    post /v1/problem/publish (PublishReq) returns (CommonResp) // 发布题目
+	@handler Publish
+	post /v1/problem/publish (PublishReq) returns (CommonResp) // 发布题目
 
-    @handler TagList
-    get /v1/problem/tags returns (TagListResp) // 获取题目标签列表
+	@handler TagList
+	get /v1/problem/tags returns (TagListResp) // 获取题目标签列表
+
+	@handler GetProblemDetail
+	get /v1/problem/detail (GetProblemDetailReq) returns (GetProblemDetailResp)
 }
 
-@server(
-    jwt: Auth
-    middleware: AdminCheck
+@server (
+	jwt:        Auth
+	middleware: AdminCheck
 )
 service problem-api {
-    @handler Audit
-    post /v1/problem/audit (AuditReq) returns (CommonResp) // 审核题目
+	@handler Audit
+	post /v1/problem/audit (AuditReq) returns (CommonResp) // 审核题目
 
-    @handler AuditProblemList
-    get /v1/problem/auditlist (ListReq) returns (ListResp)
+	@handler AuditProblemList
+	get /v1/problem/auditlist (ListReq) returns (ListResp)
 }
 

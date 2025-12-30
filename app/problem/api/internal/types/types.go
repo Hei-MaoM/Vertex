@@ -16,6 +16,18 @@ type CommonResp struct {
 	Data   interface{} `json:"data",omitempty`
 }
 
+type GetProblemDetailReq struct {
+	Id int64 `form:"id"`
+}
+
+type GetProblemDetailResp struct {
+	Status int32         `json:"status"`
+	Msg    string        `json:"msg"`
+	Error  string        `json:"error",omitempty`
+	Total  int64         `json:"total"`
+	Data   ProblemDetail `json:"data",omitempty`
+}
+
 type ListReq struct {
 	Page     int64  `json:"page,default=1"`       // 当前页码
 	PageSize int64  `json:"page_size,default=20"` // 每页显示数量
@@ -29,6 +41,17 @@ type ListResp struct {
 	Error  string        `json:"error",omitempty`
 	Total  int64         `json:"total"`
 	Data   []ProblemPost `json:"data",omitempty`
+}
+
+type ProblemDetail struct {
+	Id         int64  `json:"id"`
+	ProblemId  int64  `json:"problem_id"` // 关联的原始题目ID
+	Title      string `json:"title"`
+	Content    string `json:"content"`  // 帖子内容
+	Solution   string `json:"solution"` // 代码/题解
+	Source     string `json:"source"`
+	IsSolved   bool   `json:"is_solved"`   // 当前用户是否已打卡该题
+	ProblemUrl string `json:"problem_url"` // 原题链接 (需要关联查 problem 表)
 }
 
 type ProblemPost struct {

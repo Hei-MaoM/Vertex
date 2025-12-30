@@ -22,6 +22,7 @@ type ServiceContext struct {
 	TagModel         model.TagModel
 	ProblemTagModel  model.ProblemTagModel
 	UserCollectModel model.UserCollectModel
+	UserSolvedModel  model.UserSolvedModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -36,6 +37,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		TagModel:         model.NewTagModel(conn, c.CacheRedis),
 		ProblemTagModel:  model.NewProblemTagModel(conn, c.CacheRedis),
 		UserCollectModel: model.NewUserCollectModel(conn, c.CacheRedis),
+		UserSolvedModel:  model.NewUserSolvedModel(conn, c.CacheRedis),
 		AdminCheck:       middleware.NewAdminCheckMiddleware().Handle,
 	}
 }
