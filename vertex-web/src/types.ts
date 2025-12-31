@@ -14,6 +14,9 @@ export interface User {
     authority: number; // 1=普通, 2=管理员, 3=超管
     status: number;
     created_at: string;
+    solvecnt: number;
+    collectcnt: number;
+    postcnt: number;
 }
 
 // 登录响应
@@ -36,8 +39,9 @@ export interface ProblemPost {
     title: string;
     source: string;
     // score: number; // 已删除
-    tags: Tag[];
+    tags: string;
     is_solved: boolean;
+    authorid: number;
 }
 
 // 题目详情 (Modal用)
@@ -50,7 +54,8 @@ export interface ProblemDetail {
     solution: string;
     is_solved: boolean;
     problem_url: string;
-    // tags: Tag[]; // 如果后端详情接口没返回 tags，这里就先不写，或者复用列表的 tags
+    view_num:number;
+    // tags: string; // 如果后端详情接口没返回 tags，这里就先不写，或者复用列表的 tags
 }
 
 // 列表响应
@@ -72,7 +77,6 @@ export interface UploadTokenResp {
     domain: string;
 }
 
-// 本地上传响应
-export interface LocalUploadResp {
-    url: string;
+export interface SolveReq {
+    id: number; // 注意：后端是 Id (PostId)，前端传 id
 }

@@ -4,12 +4,11 @@
 package logic
 
 import (
+	"Vertex/app/problem/api/internal/svc"
+	"Vertex/app/problem/api/internal/types"
 	"Vertex/pkg/errno"
 	"context"
 	"log"
-
-	"Vertex/app/problem/api/internal/svc"
-	"Vertex/app/problem/api/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -51,10 +50,13 @@ func (l *ProblemListLogic) ProblemList(req *types.ListReq) (resp *types.ListResp
 
 	dataList := make([]types.ProblemPost, 0, len(posts))
 	for _, p := range posts {
+		problem, _ := l.svcCtx.ProblemModel.FindOne(l.ctx, p.ProblemId)
 		dataList = append(dataList, types.ProblemPost{
-			Id:    int64(p.Id),
-			Title: p.Title,
-			Tags:  []types.Tag{}, // 暂时留空
+			Id:       int64(p.Id),
+			Title:    p.Title,
+			Tags:     problem.TagsStr,
+			AuthorId: int64(p.UserId),
+			Source:   problem.Source,
 		})
 	}
 

@@ -39,8 +39,13 @@ func (l *PublishLogic) Publish(req *types.PublishReq) (resp *types.CommonResp, e
 		var tag string
 		for i := 0; i < len(req.TagIds); i += 1 {
 			tag1, _ := l.svcCtx.TagModel.FindOne(l.ctx, uint64(req.TagIds[i]))
-			tag = fmt.Sprintf("%s,%s", tag, tag1.Name)
+			if i != 0 {
+				tag = fmt.Sprintf("%s,%s", tag, tag1.Name)
+			} else {
+				tag = tag1.Name
+			}
 		}
+
 		problem = &model.Problem{
 			Title:      req.ProblemTitle,
 			Source:     req.ProblemSource,
@@ -51,7 +56,7 @@ func (l *PublishLogic) Publish(req *types.PublishReq) (resp *types.CommonResp, e
 		}
 		_, _ = l.svcCtx.ProblemModel.Insert(l.ctx, problem)
 
-	} else {
+	} else if err != nil {
 		return &types.CommonResp{
 			Status: errno.ErrorDatabase,
 			Msg:    errno.GetMsg(errno.ErrorDatabase),

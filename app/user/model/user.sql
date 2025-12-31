@@ -8,7 +8,9 @@ CREATE TABLE `users`
     `authority`  tinyint(4) NOT NULL DEFAULT '1' COMMENT '权限: 1-普通用户, 2-管理员',
     `status`     tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 1-启用, 0-禁用',
     `phone`      varchar(20)           DEFAULT '' COMMENT '手机号',
-
+    `solve_cnt`   int unsigned NOT NULL DEFAULT 0 COMMENT '解题通过总数',
+    `collect_cnt` int unsigned NOT NULL DEFAULT 0 COMMENT '收藏总数',
+    `post_cnt`    int unsigned NOT NULL DEFAULT 0 COMMENT '发帖总数',
     `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted_at` timestamp NULL DEFAULT NULL COMMENT '软删除时间',

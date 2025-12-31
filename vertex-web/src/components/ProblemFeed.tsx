@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import type {ProblemPost} from '../types';
 import { problemApi } from '../lib/api';
-import { CheckCircle2, MessageSquare, ThumbsUp, Tag as TagIcon, Loader2 } from 'lucide-react';
+import { CheckCircle2, Tag as TagIcon, Loader2 } from 'lucide-react';
+import { AuthorBadge } from './AuthorBadge'; // 确保你已经创建了这个组件
 
 interface Props {
     onItemClick: (id: number) => void;
@@ -10,20 +11,26 @@ interface Props {
 export const ProblemFeed = ({ onItemClick }: Props) => {
     const [problems, setProblems] = useState<ProblemPost[]>([]);
     const [loading, setLoading] = useState(true);
+    const [debugMsg, setDebugMsg] = useState("");
 
     useEffect(() => {
         const fetchProblems = async () => {
             try {
+                // 使用 any 绕过类型检查，直接读取真实结构
                 const res = await problemApi.get<any>('/v1/problem/list', {
                     params: { page: 1, page_size: 20 }
                 });
 
+                // 兼容 status 200 和 0
                 if (res.data.status === 200 || res.data.status === 0) {
                     const list = res.data.data || [];
                     setProblems(list);
+                } else {
+                    setDebugMsg(`状态码非200: ${res.data.status}`);
                 }
             } catch (err: any) {
                 console.error("获取题目失败", err);
+                setDebugMsg("请求报错: " + err.message);
             } finally {
                 setLoading(false);
             }
@@ -33,7 +40,14 @@ export const ProblemFeed = ({ onItemClick }: Props) => {
 
     if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500" /></div>;
 
-    if (problems.length === 0) return <div className="text-center p-10 text-gray-400">暂无题目</div>;
+    if (problems.length === 0) {
+        return (
+            <div className="text-center p-10 text-gray-400">
+                <p>暂无题目</p>
+                {debugMsg && <p className="text-xs text-red-400 mt-2">Debug: {debugMsg}</p>}
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-4">
@@ -54,18 +68,28 @@ export const ProblemFeed = ({ onItemClick }: Props) => {
                                 </h3>
                                 {item.is_solved && <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-50" />}
                             </div>
-                            <div className="flex gap-2 mb-4">
-                                {(item.tags || []).map(tag => (
-                                    <div key={tag.id} className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
-                                        <TagIcon size={12} /> {tag.name}
-                                    </div>
-                                ))}
+
+                            {/* ✨ 作者信息 (解耦组件) */}
+                            {item.authorid > 0 && (
+                                <div className="flex items-center gap-2 mb-3 mt-1" onClick={(e) => e.stopPropagation()}>
+                                    <AuthorBadge userId={item.authorid} />
+                                </div>
+                            )}
+
+                            {/* ✨ Tags (字符串分割) */}
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {item.tags && item.tags.length > 0 ? (
+                                    item.tags.split(',').map((tagName, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-md"
+                                        >
+                                            <TagIcon size={12} /> {tagName.trim()}
+                                        </div>
+                                    ))
+                                ) : null}
                             </div>
                         </div>
-                    </div>
-                    <div className="flex items-center gap-6 pt-4 border-t border-gray-50 text-gray-400 text-sm">
-                        <button className="flex items-center gap-1 hover:text-blue-500 ml-auto"><ThumbsUp size={16} /> 赞</button>
-                        <button className="flex items-center gap-1 hover:text-blue-500"><MessageSquare size={16} /> 评论</button>
                     </div>
                 </div>
             ))}

@@ -6,6 +6,7 @@ package logic
 import (
 	"Vertex/pkg/errno"
 	"context"
+	"encoding/json"
 
 	"Vertex/app/problem/api/internal/svc"
 	"Vertex/app/problem/api/internal/types"
@@ -13,48 +14,35 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type AuditProblemListLogic struct {
+type GetMyPostsLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewAuditProblemListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AuditProblemListLogic {
-	return &AuditProblemListLogic{
+func NewGetMyPostsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetMyPostsLogic {
+	return &GetMyPostsLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *AuditProblemListLogic) AuditProblemList(req *types.ListReq) (resp *types.ListResp, err error) {
-	total, err := l.svcCtx.ProblemPostModel.CountPending(l.ctx)
+func (l *GetMyPostsLogic) GetMyPosts(req *types.GetMyPostsReq) (resp *types.ListResp, err error) {
+	userId, _ := l.ctx.Value("id").(json.Number).Int64()
+	posts, total, err := l.svcCtx.ProblemPostModel.FindPosts(l.ctx, userId, req.Status, req.Page, req.PageSize)
 	if err != nil {
 		return nil, err
 	}
-
-	if total == 0 {
-		return &types.ListResp{
-			Status: errno.Success,
-			Msg:    "ok",
-			Total:  0,
-			Data:   []types.ProblemPost{},
-		}, nil
-	}
-
-	posts, err := l.svcCtx.ProblemPostModel.FindNotApproved(l.ctx, req.Page, req.PageSize)
-	if err != nil {
-		return nil, err
-	}
-
 	dataList := make([]types.ProblemPost, 0, len(posts))
 	for _, p := range posts {
 		problem, _ := l.svcCtx.ProblemModel.FindOne(l.ctx, p.ProblemId)
 		dataList = append(dataList, types.ProblemPost{
-			Id:     int64(p.Id),
-			Title:  p.Title,
-			Tags:   problem.TagsStr,
-			Source: problem.Source,
+			Id:       int64(p.Id),
+			Title:    p.Title,
+			Tags:     problem.TagsStr,
+			AuthorId: int64(p.UserId),
+			Source:   problem.Source,
 		})
 	}
 

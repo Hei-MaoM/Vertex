@@ -41,13 +41,16 @@ func (l *ShowInfoLogic) ShowInfo(req *types.UserInfoReq) (resp *types.UserInfoRe
 		Status: errno.Success,
 		Msg:    "ok",
 		Data: types.UserInfo{
-			Id:        int64(user.Id),
-			Username:  user.Username,
-			Email:     user.Email,
-			Authority: user.Authority,
-			Status:    user.Status,
-			Avatar:    user.Avatar,
-			CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
+			Id:         int64(user.Id),
+			Username:   user.Username,
+			Email:      user.Email,
+			Authority:  user.Authority,
+			Status:     user.Status,
+			Avatar:     user.Avatar,
+			SolveCnt:   user.SolveCnt,
+			CollectCnt: user.CollectCnt,
+			PostCnt:    user.PostCnt,
+			CreatedAt:  user.CreatedAt.Format("2006-01-02 15:04:05"),
 		},
 	}, nil
 }

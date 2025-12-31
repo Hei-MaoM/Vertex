@@ -11,6 +11,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"math/rand"
+	"strconv"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -51,6 +54,24 @@ func (l *GetProblemDetailLogic) GetProblemDetail(req *types.GetProblemDetailReq)
 			logx.Errorf("Check UserSolved failed: %v", err)
 		}
 	}
+	viewCountKey := fmt.Sprintf("vertex:post:views:%d", req.Id)
+	newView, _ := l.svcCtx.Redis.Incr(viewCountKey)
+	if newView == 1 && p.ViewNum > uint64(newView) {
+		newView = int64(p.ViewNum + 1)
+		err := l.svcCtx.Redis.Set(viewCountKey, strconv.FormatInt(newView, 10))
+		if err != nil {
+			return nil, err
+		}
+	}
+	if rand.Intn(10) == 0 {
+		p.ViewNum = uint64(newView)
+		go func(pid, views int64) {
+			err := l.svcCtx.ProblemPostModel.UpdateViewNum(l.ctx, pid, views)
+			if err != nil {
+				logx.Errorf("Async update view_num failed (id=%d): %v", pid, err)
+			}
+		}(int64(p.Id), newView)
+	}
 	return &types.GetProblemDetailResp{
 		Status: errno.Success,
 		Msg:    "OK",
@@ -63,6 +84,7 @@ func (l *GetProblemDetailLogic) GetProblemDetail(req *types.GetProblemDetailReq)
 			Source:     problem.Source, // 来源通常存原题表，也可以存 post 表，看你设计
 			IsSolved:   isSolved,
 			ProblemUrl: problemUrl,
+			ViewNum:    newView,
 		},
 	}, nil
 }

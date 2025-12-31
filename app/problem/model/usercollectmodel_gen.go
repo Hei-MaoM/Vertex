@@ -24,15 +24,15 @@ var (
 	userCollectRowsExpectAutoSet   = strings.Join(stringx.Remove(userCollectFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
 	userCollectRowsWithPlaceHolder = strings.Join(stringx.Remove(userCollectFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
-	cacheUserCollectIdPrefix                 = "cache:userCollect:id:"
-	cacheUserCollectUserIdTargetIdTypePrefix = "cache:userCollect:userId:targetId:type:"
+	cacheUserCollectIdPrefix             = "cache:userCollect:id:"
+	cacheUserCollectUserIdTargetIdPrefix = "cache:userCollect:userId:targetId:"
 )
 
 type (
 	userCollectModel interface {
 		Insert(ctx context.Context, data *UserCollect) (sql.Result, error)
 		FindOne(ctx context.Context, id uint64) (*UserCollect, error)
-		FindOneByUserIdTargetIdType(ctx context.Context, userId uint64, targetId uint64, tp uint64) (*UserCollect, error)
+		FindOneByUserIdTargetId(ctx context.Context, userId uint64, targetId uint64) (*UserCollect, error)
 		Update(ctx context.Context, data *UserCollect) error
 		Delete(ctx context.Context, id uint64) error
 	}
@@ -46,7 +46,6 @@ type (
 		Id        uint64    `db:"id"`
 		UserId    uint64    `db:"user_id"`
 		TargetId  uint64    `db:"target_id"` // problem_id 或 post_id
-		Type      uint64    `db:"type"`      // 1:题目, 2:帖子
 		CreatedAt time.Time `db:"created_at"`
 	}
 )
@@ -65,11 +64,11 @@ func (m *defaultUserCollectModel) Delete(ctx context.Context, id uint64) error {
 	}
 
 	userCollectIdKey := fmt.Sprintf("%s%v", cacheUserCollectIdPrefix, id)
-	userCollectUserIdTargetIdTypeKey := fmt.Sprintf("%s%v:%v:%v", cacheUserCollectUserIdTargetIdTypePrefix, data.UserId, data.TargetId, data.Type)
+	userCollectUserIdTargetIdKey := fmt.Sprintf("%s%v:%v", cacheUserCollectUserIdTargetIdPrefix, data.UserId, data.TargetId)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, id)
-	}, userCollectIdKey, userCollectUserIdTargetIdTypeKey)
+	}, userCollectIdKey, userCollectUserIdTargetIdKey)
 	return err
 }
 
@@ -90,12 +89,12 @@ func (m *defaultUserCollectModel) FindOne(ctx context.Context, id uint64) (*User
 	}
 }
 
-func (m *defaultUserCollectModel) FindOneByUserIdTargetIdType(ctx context.Context, userId uint64, targetId uint64, tp uint64) (*UserCollect, error) {
-	userCollectUserIdTargetIdTypeKey := fmt.Sprintf("%s%v:%v:%v", cacheUserCollectUserIdTargetIdTypePrefix, userId, targetId, tp)
+func (m *defaultUserCollectModel) FindOneByUserIdTargetId(ctx context.Context, userId uint64, targetId uint64) (*UserCollect, error) {
+	userCollectUserIdTargetIdKey := fmt.Sprintf("%s%v:%v", cacheUserCollectUserIdTargetIdPrefix, userId, targetId)
 	var resp UserCollect
-	err := m.QueryRowIndexCtx(ctx, &resp, userCollectUserIdTargetIdTypeKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v any) (i any, e error) {
-		query := fmt.Sprintf("select %s from %s where `user_id` = ? and `target_id` = ? and `type` = ? limit 1", userCollectRows, m.table)
-		if err := conn.QueryRowCtx(ctx, &resp, query, userId, targetId, tp); err != nil {
+	err := m.QueryRowIndexCtx(ctx, &resp, userCollectUserIdTargetIdKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v any) (i any, e error) {
+		query := fmt.Sprintf("select %s from %s where `user_id` = ? and `target_id` = ? limit 1", userCollectRows, m.table)
+		if err := conn.QueryRowCtx(ctx, &resp, query, userId, targetId); err != nil {
 			return nil, err
 		}
 		return resp.Id, nil
@@ -112,11 +111,11 @@ func (m *defaultUserCollectModel) FindOneByUserIdTargetIdType(ctx context.Contex
 
 func (m *defaultUserCollectModel) Insert(ctx context.Context, data *UserCollect) (sql.Result, error) {
 	userCollectIdKey := fmt.Sprintf("%s%v", cacheUserCollectIdPrefix, data.Id)
-	userCollectUserIdTargetIdTypeKey := fmt.Sprintf("%s%v:%v:%v", cacheUserCollectUserIdTargetIdTypePrefix, data.UserId, data.TargetId, data.Type)
+	userCollectUserIdTargetIdKey := fmt.Sprintf("%s%v:%v", cacheUserCollectUserIdTargetIdPrefix, data.UserId, data.TargetId)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, userCollectRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.TargetId, data.Type)
-	}, userCollectIdKey, userCollectUserIdTargetIdTypeKey)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?)", m.table, userCollectRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.TargetId)
+	}, userCollectIdKey, userCollectUserIdTargetIdKey)
 	return ret, err
 }
 
@@ -127,11 +126,11 @@ func (m *defaultUserCollectModel) Update(ctx context.Context, newData *UserColle
 	}
 
 	userCollectIdKey := fmt.Sprintf("%s%v", cacheUserCollectIdPrefix, data.Id)
-	userCollectUserIdTargetIdTypeKey := fmt.Sprintf("%s%v:%v:%v", cacheUserCollectUserIdTargetIdTypePrefix, data.UserId, data.TargetId, data.Type)
+	userCollectUserIdTargetIdKey := fmt.Sprintf("%s%v:%v", cacheUserCollectUserIdTargetIdPrefix, data.UserId, data.TargetId)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userCollectRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.UserId, newData.TargetId, newData.Type, newData.Id)
-	}, userCollectIdKey, userCollectUserIdTargetIdTypeKey)
+		return conn.ExecCtx(ctx, query, newData.UserId, newData.TargetId, newData.Id)
+	}, userCollectIdKey, userCollectUserIdTargetIdKey)
 	return err
 }
 

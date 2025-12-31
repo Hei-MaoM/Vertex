@@ -16,6 +16,16 @@ type CommonResp struct {
 	Data   interface{} `json:"data",omitempty`
 }
 
+type DeletePostReq struct {
+	Id int64 `json:"id"`
+}
+
+type GetMyPostsReq struct {
+	Page     int64 `form:"page,default=1"`
+	PageSize int64 `form:"page_size,default=20"`
+	Status   int64 `form:"status,default=-1"` // -1:全部, 0:待审, 1:已发, 2:撤销
+}
+
 type GetProblemDetailReq struct {
 	Id int64 `form:"id"`
 }
@@ -52,14 +62,17 @@ type ProblemDetail struct {
 	Source     string `json:"source"`
 	IsSolved   bool   `json:"is_solved"`   // 当前用户是否已打卡该题
 	ProblemUrl string `json:"problem_url"` // 原题链接 (需要关联查 problem 表)
+	ViewNum    int64  `json:"view_num"`
 }
 
 type ProblemPost struct {
-	Id     int64   `json:"id"`
-	Title  string  `json:"title"`
-	Source string  `json:"source"`
-	Score  float64 `json:"score"`
-	Tags   []Tag   `json:"tags"`
+	Id       int64   `json:"id"`
+	Title    string  `json:"title"`
+	Source   string  `json:"source"`
+	Score    float64 `json:"score"`
+	Tags     string  `json:"tags"`
+	IsSolved bool    `json:"is_solved"`
+	AuthorId int64   `json:"authorid"`
 }
 
 type PublishReq struct {
@@ -70,6 +83,10 @@ type PublishReq struct {
 	Title         string  `json:"title"`
 	Content       string  `json:"content"`
 	Solution      string  `json:"solution"`
+}
+
+type SolveProblemReq struct {
+	Id int64 `json:"id"`
 }
 
 type Tag struct {

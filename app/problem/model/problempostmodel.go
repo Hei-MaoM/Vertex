@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/zeromicro/go-zero/core/stores/cache"
@@ -19,6 +20,8 @@ type (
 		FindNotApproved(ctx context.Context, page, pageSize int64) ([]*ProblemPost, error)
 		CountPending(ctx context.Context) (int64, error)
 		CountProbleming(ctx context.Context) (int64, error)
+		UpdateViewNum(ctx context.Context, id, viewNum int64) error
+		FindPosts(ctx context.Context, userId, status, page, pageSize int64) ([]*ProblemPost, int64, error)
 	}
 
 	customProblemPostModel struct {
@@ -61,4 +64,37 @@ func (m *customProblemPostModel) FindApproved(ctx context.Context, page, pageSiz
 		return nil, err
 	}
 	return resp, nil
+}
+func (m *customProblemPostModel) UpdateViewNum(ctx context.Context, id, viewNum int64) error {
+	problemPostIdKey := fmt.Sprintf("%s%v", cacheProblemPostIdPrefix, id)
+	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("update %s set view_num = ? where `id` = ?", m.table)
+		return conn.ExecCtx(ctx, query, viewNum, id)
+	}, problemPostIdKey)
+	return err
+}
+
+func (m *customProblemPostModel) FindPosts(ctx context.Context, userId, status, page, pageSize int64) ([]*ProblemPost, int64, error) {
+	where := "user_id = ?"
+	args := []interface{}{userId}
+
+	if status != -1 {
+		where += " AND status = ?"
+		args = append(args, status)
+	}
+
+	// 查总数
+	var total int64
+	countQuery := fmt.Sprintf("SELECT count(*) FROM %s WHERE %s", m.table, where)
+	m.CachedConn.QueryRowNoCacheCtx(ctx, &total, countQuery, args...) // 注意: 用 NoCache 或者处理好缓存
+
+	// 查列表
+	offset := (page - 1) * pageSize
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s ORDER BY id DESC LIMIT ?, ?", problemPostRows, m.table, where)
+	args = append(args, offset, pageSize)
+
+	var resp []*ProblemPost
+	err := m.CachedConn.QueryRowsNoCacheCtx(ctx, &resp, query, args...)
+
+	return resp, total, err
 }

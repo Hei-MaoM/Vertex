@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react';
-import { X, Loader2, CheckCircle2, ExternalLink } from 'lucide-react';
+import { X, Loader2, CheckCircle2, ExternalLink, Eye, XCircle } from 'lucide-react';
 import { problemApi } from '../lib/api';
-import type {ProblemDetail} from '../types';
+import type {CommonResp, ProblemDetail} from '../types';
 
 interface Props {
     problemId: number | null;
     onClose: () => void;
+    // ✨ 新增回调：打卡成功后，通知父组件刷新列表（让列表上的对勾也亮起来）
+    onSolveSuccess?: () => void;
 }
 
-export const ProblemDetailModal = ({ problemId, onClose }: Props) => {
+export const ProblemDetailModal = ({ problemId, onClose, onSolveSuccess }: Props) => {
     const [detail, setDetail] = useState<ProblemDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    // ✨ 本地状态：是否已解决 (为了即时更新 UI)
+    const [isSolved, setIsSolved] = useState(false);
+    const [solving, setSolving] = useState(false);
 
     useEffect(() => {
         if (!problemId) return;
@@ -20,38 +26,53 @@ export const ProblemDetailModal = ({ problemId, onClose }: Props) => {
             try {
                 setLoading(true);
                 setError("");
-
-                // 1. 调用接口
-                // 后端返回结构: { Status: 0, Msg: "OK", Data: { ...Detail } }
                 const res = await problemApi.get<any>('/v1/problem/detail', {
                     params: { id: problemId }
                 });
-
-                console.log("详情页返回数据:", res.data); // 🔍 调试日志
-
-                // 2. 判断状态 (兼容后端大小写，Typescript 定义是小写 status，但实际 JSON 可能是大写 Status)
-                // 你的代码返回的是 types.GetProblemDetailResp{ Status: ... }
-                // go-zero 默认 JSON tag 是小写，除非你显式改了大写
-                // 这里做个全兼容处理
-                const status = res.data.status !== undefined ? res.data.status : res.data.Status;
-                const data = res.data.data !== undefined ? res.data.data : res.data.Data;
-                const msg = res.data.msg || res.data.Msg;
+                const status = res.data.status ?? res.data.Status;
+                const data = res.data.data ?? res.data.Data;
 
                 if (status === 0 || status === 200) {
                     setDetail(data);
+                    setIsSolved(data.is_solved); // ✨ 初始化状态
                 } else {
-                    setError(msg || "加载失败");
+                    setError(res.data.msg || "加载失败");
                 }
             } catch (err: any) {
-                // 如果是 401，拦截器会刷新页面，这里给个提示
-                setError(err.response?.data?.msg || "获取详情失败");
+                setError(err.response?.data?.msg || "获取详情失败，请先登录");
             } finally {
                 setLoading(false);
             }
         };
-
         fetchDetail();
     }, [problemId]);
+
+    // ✨ 打卡逻辑
+    const handleSolve = async () => {
+        if (isSolved) return; // 已完成的不处理
+
+        if (!window.confirm("恭喜你解决了这道题！确定要标记为“已完成”吗？")) return;
+
+        try {
+            setSolving(true);
+            // 调用 Solve 接口
+            const res = await problemApi.post<CommonResp>('/v1/problem/solve', {
+                id: problemId // 传 PostId 给后端
+            });
+
+            if (res.data.status === 0 || res.data.status === 200) {
+                alert("打卡成功！🎉");
+                setIsSolved(true); // 变绿
+                if (onSolveSuccess) onSolveSuccess(); // 通知列表刷新
+            } else {
+                alert("操作失败: " + res.data.msg);
+            }
+        } catch (err: any) {
+            alert("请求错误: " + err.message);
+        } finally {
+            setSolving(false);
+        }
+    };
 
     if (!problemId) return null;
 
@@ -70,7 +91,7 @@ export const ProblemDetailModal = ({ problemId, onClose }: Props) => {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-8">
+                <div className="flex-1 overflow-y-auto p-8 pb-24">
                     {loading ? (
                         <div className="h-full flex items-center justify-center">
                             <Loader2 className="animate-spin text-blue-500 w-10 h-10" />
@@ -84,54 +105,81 @@ export const ProblemDetailModal = ({ problemId, onClose }: Props) => {
                         <div className="space-y-8">
                             {/* Title Area */}
                             <div>
-                                <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                <div className="flex items-center gap-3 mb-3 flex-wrap">
                       <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-sm font-bold">
                         {detail.source || "原创"}
                       </span>
                                     <h1 className="text-3xl font-black text-gray-900">{detail.title}</h1>
-
-                                    {/* IsSolved 对勾 */}
-                                    {detail.is_solved && (
-                                        <div className="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs font-bold border border-green-200">
-                                            <CheckCircle2 size={14} /> 已解决
-                                        </div>
-                                    )}
                                 </div>
 
-                                {/* 原题链接 */}
-                                {detail.problem_url && (
-                                    <a
-                                        href={detail.problem_url.startsWith('http') ? detail.problem_url : `http://${detail.problem_url}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-2 bg-blue-50 px-3 py-1 rounded-lg"
-                                    >
-                                        <ExternalLink size={14}/> 跳转至原题链接
-                                    </a>
-                                )}
+                                <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+                                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
+                                        <Eye size={14} />
+                                        <span>{ detail.view_num || 0} 次浏览</span>
+                                    </div>
+                                    {detail.problem_url && (
+                                        <a
+                                            href={detail.problem_url.startsWith('http') ? detail.problem_url : `http://${detail.problem_url}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="flex items-center gap-1 text-blue-600 hover:underline"
+                                        >
+                                            <ExternalLink size={14}/> 原题链接
+                                        </a>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* 题目内容 */}
+                            {/* Body */}
                             <div className="prose max-w-none">
-                                <h3 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-blue-500 pl-3">题目内容 / 推荐语</h3>
+                                <h3 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-blue-500 pl-3">题目内容</h3>
                                 <div className="bg-gray-50 p-6 rounded-xl text-gray-700 whitespace-pre-wrap leading-relaxed border border-gray-100">
                                     {detail.content || "暂无内容"}
                                 </div>
                             </div>
 
-                            {/* 题解代码 */}
+                            {/* Solution */}
                             {detail.solution && (
                                 <div className="prose max-w-none">
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-green-500 pl-3">参考代码</h3>
                                     <div className="bg-[#1e1e1e] text-gray-200 p-6 rounded-xl font-mono text-sm overflow-x-auto shadow-inner border border-gray-800 relative group">
                                         <pre className="whitespace-pre">{detail.solution}</pre>
-                                        <div className="absolute top-2 right-2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition">Code</div>
                                     </div>
                                 </div>
                             )}
                         </div>
                     )}
                 </div>
+
+                {/* ✨✨✨ 底部固定操作栏 (打卡按钮) ✨✨✨ */}
+                {!loading && !error && (
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-end gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                        <button
+                            onClick={handleSolve}
+                            disabled={isSolved || solving}
+                            className={`
+                        px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition shadow-sm
+                        ${isSolved
+                                ? 'bg-green-100 text-green-700 cursor-default border border-green-200'
+                                : 'bg-red-500 text-white hover:bg-red-600 active:scale-95'
+                            }
+                        ${solving ? 'opacity-70 cursor-wait' : ''}
+                    `}
+                        >
+                            {solving ? (
+                                <Loader2 className="animate-spin" size={20} />
+                            ) : isSolved ? (
+                                <>
+                                    <CheckCircle2 size={20} /> 已解决
+                                </>
+                            ) : (
+                                <>
+                                    <XCircle size={20} /> 标记为已解决
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

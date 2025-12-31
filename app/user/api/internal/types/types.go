@@ -105,17 +105,20 @@ type User struct {
 }
 
 type UserInfo struct {
-	Id        int64  `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Authority int64  `json:"authority"`
-	Status    int64  `json:"status"`
-	Avatar    string `json:"avatar"`
-	CreatedAt string `json:"created_at"`
+	Id         int64  `json:"id"`
+	Username   string `json:"username"`
+	Email      string `json:"email"`
+	Authority  int64  `json:"authority"`
+	Status     int64  `json:"status"`
+	Avatar     string `json:"avatar"`
+	SolveCnt   uint64 `json:"solvecnt"`
+	CollectCnt uint64 `json:"collectcnt"`
+	PostCnt    uint64 `json:"postcnt"`
+	CreatedAt  string `json:"created_at"`
 }
 
 type UserInfoReq struct {
-	Id int64 `json:"id"`
+	Id int64 `form:"id"`
 }
 
 type UserInfoResp struct {
