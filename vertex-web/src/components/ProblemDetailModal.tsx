@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { X, Loader2, CheckCircle2, ExternalLink, Eye, XCircle } from 'lucide-react';
-import { problemApi } from '../lib/api';
+import {useEffect, useState} from 'react';
+import {CheckCircle2, ExternalLink, Eye, Loader2, X, XCircle} from 'lucide-react';
+import {problemApi} from '../lib/api';
 import type {CommonResp, ProblemDetail} from '../types';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
     onSolveSuccess?: () => void;
 }
 
-export const ProblemDetailModal = ({ problemId, onClose, onSolveSuccess }: Props) => {
+export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) => {
     const [detail, setDetail] = useState<ProblemDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -114,8 +114,8 @@ export const ProblemDetailModal = ({ problemId, onClose, onSolveSuccess }: Props
 
                                 <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
                                     <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
-                                        <Eye size={14} />
-                                        <span>{ detail.view_num || 0} 次浏览</span>
+                                        <Eye size={14}/>
+                                        <span>{detail.view_num || 0} 次浏览</span>
                                     </div>
                                     {detail.problem_url && (
                                         <a
@@ -153,7 +153,8 @@ export const ProblemDetailModal = ({ problemId, onClose, onSolveSuccess }: Props
 
                 {/* ✨✨✨ 底部固定操作栏 (打卡按钮) ✨✨✨ */}
                 {!loading && !error && (
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-end gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                    <div
+                        className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-end gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                         <button
                             onClick={handleSolve}
                             disabled={isSolved || solving}
@@ -167,14 +168,14 @@ export const ProblemDetailModal = ({ problemId, onClose, onSolveSuccess }: Props
                     `}
                         >
                             {solving ? (
-                                <Loader2 className="animate-spin" size={20} />
+                                <Loader2 className="animate-spin" size={20}/>
                             ) : isSolved ? (
                                 <>
-                                    <CheckCircle2 size={20} /> 已解决
+                                    <CheckCircle2 size={20}/> 已解决
                                 </>
                             ) : (
                                 <>
-                                    <XCircle size={20} /> 标记为已解决
+                                    <XCircle size={20}/> 标记为已解决
                                 </>
                             )}
                         </button>

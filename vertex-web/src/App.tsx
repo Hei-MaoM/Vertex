@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { UserCard } from './components/UserCard';
-import { ProblemFeed } from './components/ProblemFeed';
-import { AdminAudit } from './components/AdminAudit';
-import { LoginModal } from './components/LoginModal';
-import { EditProfileModal } from './components/EditProfileModal';
-import { PublishModal } from './components/PublishModal';
-import { ProblemDetailModal } from './components/ProblemDetailModal';
-import { AuditDetailModal } from './components/AuditDetailModal';
-import { ProfilePage } from './components/ProfilePage'; // ✨ 引入个人主页组件
-import { Search, ShieldCheck, LayoutGrid, Plus, User as UserIcon } from 'lucide-react';
+import {useState} from 'react';
+import {UserCard} from './components/UserCard';
+import {ProblemFeed} from './components/ProblemFeed';
+import {AdminAudit} from './components/AdminAudit';
+import {LoginModal} from './components/LoginModal';
+import {EditProfileModal} from './components/EditProfileModal';
+import {PublishModal} from './components/PublishModal';
+import {ProblemDetailModal} from './components/ProblemDetailModal';
+import {AuditDetailModal} from './components/AuditDetailModal';
+import {ProfilePage} from './components/ProfilePage'; // ✨ 引入个人主页组件
+import {LayoutGrid, Plus, Search, ShieldCheck, User as UserIcon} from 'lucide-react';
 import type {User} from './types';
 
 function App() {
@@ -90,7 +90,7 @@ function App() {
                                     onClick={() => setCurrentPage('profile')}
                                     className={`flex items-center gap-1 ${currentPage === 'profile' ? 'text-blue-600' : 'hover:text-blue-600'}`}
                                 >
-                                    <UserIcon size={18} /> 我的
+                                    <UserIcon size={18}/> 我的
                                 </button>
                             )}
 
@@ -177,7 +177,7 @@ function App() {
                             </div>
                         </aside>
                         <section className="col-span-1 md:col-span-9">
-                            <AdminAudit onReview={handleReviewClick} />
+                            <AdminAudit onReview={handleReviewClick}/>
                         </section>
                     </div>
                 )}

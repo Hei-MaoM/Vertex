@@ -1,7 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import type {User, ProblemPost, CommonResp} from '../types';
-import { problemApi } from '../lib/api';
-import { Loader2, Calendar, FileText, CheckCircle2, Clock, Ban, Eye, Trash2, Shield, User as UserIcon } from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import type {CommonResp, ProblemPost, User} from '../types';
+import {problemApi} from '../lib/api';
+import {
+    Ban,
+    Calendar,
+    CheckCircle2,
+    Clock,
+    Eye,
+    FileText,
+    Loader2,
+    Shield,
+    Trash2,
+    User as UserIcon
+} from 'lucide-react';
 
 interface Props {
     user: User;
@@ -10,13 +21,13 @@ interface Props {
 }
 
 const TABS = [
-    { label: '全部', value: -1, icon: <FileText size={16}/> },
-    { label: '待审核', value: 0, icon: <Clock size={16} className="text-orange-500"/> },
-    { label: '已发布', value: 1, icon: <CheckCircle2 size={16} className="text-green-500"/> },
-    { label: '已下架', value: 2, icon: <Ban size={16} className="text-red-500"/> },
+    {label: '全部', value: -1, icon: <FileText size={16}/>},
+    {label: '待审核', value: 0, icon: <Clock size={16} className="text-orange-500"/>},
+    {label: '已发布', value: 1, icon: <CheckCircle2 size={16} className="text-green-500"/>},
+    {label: '已下架', value: 2, icon: <Ban size={16} className="text-red-500"/>},
 ];
 
-export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
+export const ProfilePage = ({user, onBack, onItemClick}: Props) => {
     const [activeTab, setActiveTab] = useState(-1);
     const [posts, setPosts] = useState<ProblemPost[]>([]);
     const [loading, setLoading] = useState(true);
@@ -26,7 +37,7 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
         try {
             setLoading(true);
             const res = await problemApi.get<any>('/v1/problem/myposts', {
-                params: { page: 1, page_size: 20, status: activeTab }
+                params: {page: 1, page_size: 20, status: activeTab}
             });
             const status = res.data.status ?? res.data.Status;
             const data = res.data.data;
@@ -50,7 +61,7 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
         e.stopPropagation();
         if (!window.confirm("确定要删除这条内容吗？此操作不可恢复。")) return;
         try {
-            const res = await problemApi.post<CommonResp>('/v1/problem/delete', { id: id });
+            const res = await problemApi.post<CommonResp>('/v1/problem/delete', {id: id});
             if (res.data.status === 0 || res.data.status === 200) {
                 alert("删除成功");
                 setPosts(prev => prev.filter(post => post.id !== id));
@@ -69,7 +80,7 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 relative overflow-hidden">
                 {/* 背景装饰 */}
                 <div className="absolute top-0 right-0 p-10 opacity-[0.03]">
-                    <UserIcon size={200} />
+                    <UserIcon size={200}/>
                 </div>
 
                 <div className="flex flex-col md:flex-row items-start gap-8 relative z-10">
@@ -82,7 +93,9 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
                         />
                         {/* 权限徽章 */}
                         {user.authority >= 2 && (
-                            <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-1.5 rounded-full border-4 border-white shadow-sm" title="管理员">
+                            <div
+                                className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-1.5 rounded-full border-4 border-white shadow-sm"
+                                title="管理员">
                                 <Shield size={16} fill="currentColor"/>
                             </div>
                         )}
@@ -105,7 +118,8 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
                         <div className="flex flex-wrap gap-6 p-4 bg-gray-50 rounded-xl border border-gray-100 w-fit">
                             <div className="text-center min-w-[60px]">
                                 <div className="font-black text-xl text-gray-800">{user.solvecnt || 0}</div>
-                                <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">已解决</div>
+                                <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">已解决
+                                </div>
                             </div>
                             <div className="w-px bg-gray-200"></div>
                             <div className="text-center min-w-[60px]">
@@ -115,17 +129,20 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
                             <div className="w-px bg-gray-200"></div>
                             <div className="text-center min-w-[60px]">
                                 <div className="font-black text-xl text-gray-800">{user.collectcnt || 0}</div>
-                                <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">获赞/藏</div>
+                                <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">获赞/藏
+                                </div>
                             </div>
                         </div>
 
                         <div className="flex gap-4 text-sm text-gray-400">
-                            <span className="flex items-center gap-1"><Calendar size={14}/> 加入于 {user.created_at?.substring(0, 10)}</span>
+                            <span className="flex items-center gap-1"><Calendar
+                                size={14}/> 加入于 {user.created_at?.substring(0, 10)}</span>
                         </div>
                     </div>
 
                     {/* 返回按钮 */}
-                    <button onClick={onBack} className="text-sm text-gray-500 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition">
+                    <button onClick={onBack}
+                            className="text-sm text-gray-500 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition">
                         ← 返回首页
                     </button>
                 </div>
@@ -151,7 +168,9 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
                 </div>
 
                 <div className="p-6 min-h-[300px]">
-                    {loading ? <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500"/></div> :
+                    {loading ?
+                        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500"/>
+                        </div> :
                         posts.length === 0 ? <div className="text-center text-gray-400 py-10">暂无内容</div> : (
                             <div className="space-y-4">
                                 {posts.map(post => (
@@ -163,17 +182,21 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
                                         <div>
                                             <h3 className="font-bold text-gray-800 mb-1 group-hover:text-blue-600 transition text-lg">{post.title}</h3>
                                             <div className="text-xs text-gray-500 flex gap-2 items-center">
-                                                <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">{post.source || "原创"}</span>
+                                                <span
+                                                    className="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">{post.source || "原创"}</span>
                                                 {/* 可以在这里加标签 */}
                                             </div>
                                         </div>
 
                                         <div className="flex items-center gap-3">
                                             <button
-                                                onClick={(e) => { e.stopPropagation(); onItemClick(post.id); }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onItemClick(post.id);
+                                                }}
                                                 className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition"
                                             >
-                                                <Eye size={16} /> 查看
+                                                <Eye size={16}/> 查看
                                             </button>
 
                                             <button
@@ -181,7 +204,7 @@ export const ProfilePage = ({ user, onBack, onItemClick }: Props) => {
                                                 className="text-sm text-gray-400 hover:text-red-600 font-medium flex items-center gap-1 p-2 rounded-md hover:bg-red-50 transition"
                                                 title="删除"
                                             >
-                                                <Trash2 size={18} />
+                                                <Trash2 size={18}/>
                                             </button>
                                         </div>
                                     </div>

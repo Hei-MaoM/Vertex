@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import type {ProblemPost} from '../types';
-import { problemApi } from '../lib/api';
-import { CheckCircle2, Tag as TagIcon, Loader2 } from 'lucide-react';
-import { AuthorBadge } from './AuthorBadge'; // 确保你已经创建了这个组件
+import {problemApi} from '../lib/api';
+import {CheckCircle2, Loader2, Tag as TagIcon} from 'lucide-react';
+import {AuthorBadge} from './AuthorBadge'; // 确保你已经创建了这个组件
 
 interface Props {
     onItemClick: (id: number) => void;
@@ -72,7 +72,7 @@ export const ProblemFeed = ({ onItemClick }: Props) => {
                             {/* ✨ 作者信息 (解耦组件) */}
                             {item.authorid > 0 && (
                                 <div className="flex items-center gap-2 mb-3 mt-1" onClick={(e) => e.stopPropagation()}>
-                                    <AuthorBadge userId={item.authorid} />
+                                    <AuthorBadge userId={item.authorid}/>
                                 </div>
                             )}
 
@@ -84,7 +84,7 @@ export const ProblemFeed = ({ onItemClick }: Props) => {
                                             key={index}
                                             className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-md"
                                         >
-                                            <TagIcon size={12} /> {tagName.trim()}
+                                            <TagIcon size={12}/> {tagName.trim()}
                                         </div>
                                     ))
                                 ) : null}

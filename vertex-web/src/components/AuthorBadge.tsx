@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { userApi } from '../lib/api';
+import {useEffect, useState} from 'react';
+import {userApi} from '../lib/api';
 import type {CommonResp} from '../types';
 
 interface UserInfo {
@@ -11,7 +11,7 @@ interface UserInfo {
 // 简单的内存缓存
 const userCache: Record<number, UserInfo> = {};
 
-export const AuthorBadge = ({ userId }: { userId: number }) => {
+export const AuthorBadge = ({userId}: { userId: number }) => {
     const [author, setAuthor] = useState<UserInfo | null>(null);
 
     useEffect(() => {
@@ -29,7 +29,7 @@ export const AuthorBadge = ({ userId }: { userId: number }) => {
                 // 注意：你的 user.api 定义的是 GET /v1/user/showinfo (UserInfoReq)
                 // GET 请求参数要放 params 里，或者拼在 URL
                 const res = await userApi.get<CommonResp<UserInfo>>('/v1/user/showinfo', {
-                    params: { id: userId }
+                    params: {id: userId}
                 });
 
                 if (res.data.status === 0 || res.data.status === 200) {

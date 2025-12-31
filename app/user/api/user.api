@@ -1,181 +1,181 @@
 syntax = "v1"
 
-info (
-	title:   "Vertex User Service"
-	desc:    "用户服务"
-	author:  "HeiMaoM"
-	Version: "v1"
+info(
+    title: "Vertex User Service"
+    desc: "用户服务"
+    author: "HeiMaoM"
+    Version: "v1"
 )
 
 type SendEmailReq {
-	Email         string `json:"email" form:"email"`
-	OperationType int32  `json:"operation_type" form:"operation_type"` // 1=注册 2=换绑 3=修改密码
+    Email string `json:"email" form:"email"`
+    OperationType int32 `json:"operation_type" form:"operation_type"` // 1=注册 2=换绑 3=修改密码
 }
 
 type RegisterReq {
-	UserName string `json:"user_name"  `
-	Password string `json:"password" form:"password"`
-	Email    string `json:"email" form:"email"`
-	Code     string `json:"code" form:"code"`
+    UserName string `json:"user_name"  `
+    Password string `json:"password" form:"password"`
+    Email string `json:"email" form:"email"`
+    Code string `json:"code" form:"code"`
 }
 
 type LoginReq {
-	UserName string `json:"user_name" form:"user_name"`
-	Password string `json:"password" form:"password"`
+    UserName string `json:"user_name" form:"user_name"`
+    Password string `json:"password" form:"password"`
 }
 
 type CommonResp {
-	Status int32       `json:"status"`
-	Msg    string      `json:"msg"`
-	Error  string      `json:"error",omitempty`
-	Data   interface{} `json:"data",omitempty`
+    Status int32 `json:"status"`
+    Msg string `json:"msg"`
+    Error string `json:"error",omitempty`
+    Data interface{} `json:"data",omitempty`
 }
 
 type User {
-	Id        int64  `json:"id"`
-	UserName  string `json:"user_name"`
-	Email     string `json:"email"`
-	Avatar    string `json:"avatar"`
-	Status    int32  `json:"status"`
-	Authority int32  `json:"authority"`
-	CreatedAt string `json:"created_at"`
+    Id int64 `json:"id"`
+    UserName string `json:"user_name"`
+    Email string `json:"email"`
+    Avatar string `json:"avatar"`
+    Status int32 `json:"status"`
+    Authority int32 `json:"authority"`
+    CreatedAt string `json:"created_at"`
 }
 
 type TokenPayload {
-	Token     string `json:"token"`
-	ExpiresIn int64  `json:"expires_in"`
-	User      User   `json:"user"`
+    Token string `json:"token"`
+    ExpiresIn int64 `json:"expires_in"`
+    User User `json:"user"`
 }
 
 type RegisterResp {
-	Status int32  `json:"status"`
-	Msg    string `json:"msg"`
-	Error  string `json:"error",omitempty`
-	Data   User   `json:"data",omitempty`
+    Status int32 `json:"status"`
+    Msg string `json:"msg"`
+    Error string `json:"error",omitempty`
+    Data User `json:"data",omitempty`
 }
 
 type LoginResp {
-	Status int32        `json:"status"`
-	Msg    string       `json:"msg"`
-	Error  string       `json:"error",omitempty`
-	Data   TokenPayload `json:"data",omitempty`
+    Status int32 `json:"status"`
+    Msg string `json:"msg"`
+    Error string `json:"error",omitempty`
+    Data TokenPayload `json:"data",omitempty`
 }
 
 type UserInfoReq {
-	Id int64 `form:"id"`
+    Id int64 `form:"id"`
 }
 
 type UserInfo {
-	Id         int64  `json:"id"`
-	Username   string `json:"username"`
-	Email      string `json:"email"`
-	Authority  int64  `json:"authority"`
-	Status     int64  `json:"status"`
-	Avatar     string `json:"avatar"`
-	SolveCnt   uint64 `json:"solvecnt"`
-	CollectCnt uint64 `json:"collectcnt"`
-	PostCnt    uint64 `json:"postcnt"`
-	CreatedAt  string `json:"created_at"`
+    Id int64 `json:"id"`
+    Username string `json:"username"`
+    Email string `json:"email"`
+    Authority int64 `json:"authority"`
+    Status int64 `json:"status"`
+    Avatar string `json:"avatar"`
+    SolveCnt uint64 `json:"solvecnt"`
+    CollectCnt uint64 `json:"collectcnt"`
+    PostCnt uint64 `json:"postcnt"`
+    CreatedAt string `json:"created_at"`
 }
 
 type UserInfoResp {
-	Status int32    `json:"status"`
-	Msg    string   `json:"msg"`
-	Error  string   `json:"error",omitempty`
-	Data   UserInfo `json:"data",omitempty`
+    Status int32 `json:"status"`
+    Msg string `json:"msg"`
+    Error string `json:"error",omitempty`
+    Data UserInfo `json:"data",omitempty`
 }
 
 service user-api {
-	@handler SendEmail
-	post /v1/user/send_email (SendEmailReq) returns (CommonResp)
+    @handler SendEmail
+    post /v1/user/send_email (SendEmailReq) returns (CommonResp)
 
-	@handler Register
-	post /v1/user/register (RegisterReq) returns (RegisterResp)
+    @handler Register
+    post /v1/user/register (RegisterReq) returns (RegisterResp)
 
-	@handler Login
-	post /v1/user/login (LoginReq) returns (LoginResp)
+    @handler Login
+    post /v1/user/login (LoginReq) returns (LoginResp)
 
-	@handler ShowInfo
-	get /v1/user/showinfo (UserInfoReq) returns (UserInfoResp)
+    @handler ShowInfo
+    get /v1/user/showinfo (UserInfoReq) returns (UserInfoResp)
 }
 
 type SetAuthorityReq {
-	Id        int64 `json:"id"`
-	Authority int64 `json:"authority"`
+    Id int64 `json:"id"`
+    Authority int64 `json:"authority"`
 }
 
 type SetAuthorityResp {
-	Status int32  `json:"status"`
-	Msg    string `json:"msg"`
-	Error  string `json:"error",omitempty`
-	Data   string `json:"data",omitempty`
+    Status int32 `json:"status"`
+    Msg string `json:"msg"`
+    Error string `json:"error",omitempty`
+    Data string `json:"data",omitempty`
 }
 
-@server (
-	jwt:        Auth
-	middleware: SuperAdminCheck
+@server(
+    jwt: Auth
+    middleware: SuperAdminCheck
 )
 service user-api {
-	//设置管理员
-	@handler SetAuthority
-	post /v1/user/setauthority (SetAuthorityReq) returns (SetAuthorityResp)
+    //设置管理员
+    @handler SetAuthority
+    post /v1/user/setauthority (SetAuthorityReq) returns (SetAuthorityResp)
 }
 
 type SetStatusReq {
-	Id     int64 `json:"id"`
-	status int64 `json:"status"`
+    Id int64 `json:"id"`
+    status int64 `json:"status"`
 }
 
 type SetStatusResp {
-	Status int32  `json:"status"`
-	Msg    string `json:"msg"`
-	Error  string `json:"error",omitempty`
-	Data   string `json:"data",omitempty`
+    Status int32 `json:"status"`
+    Msg string `json:"msg"`
+    Error string `json:"error",omitempty`
+    Data string `json:"data",omitempty`
 }
 
 type UpdateInfoReq {
-	Avatar string `json:"avatar"`
+    Avatar string `json:"avatar"`
 }
 
 type UpToken {
-	Token  string `json:"token",`
-	Domain string `json:"domain"`
+    Token string `json:"token",`
+    Domain string `json:"domain"`
 }
 
 type UpdateTokenResp {
-	Status int32   `json:"status"`
-	Msg    string  `json:"msg"`
-	Error  string  `json:"error",omitempty`
-	Data   UpToken `json:"data",omitempty`
+    Status int32 `json:"status"`
+    Msg string `json:"msg"`
+    Error string `json:"error",omitempty`
+    Data UpToken `json:"data",omitempty`
 }
 
 type UpdateInfoResp {
-	Status int32  `json:"status"`
-	Msg    string `json:"msg"`
-	Error  string `json:"error",omitempty`
-	Data   string `json:"data",omitempty`
+    Status int32 `json:"status"`
+    Msg string `json:"msg"`
+    Error string `json:"error",omitempty`
+    Data string `json:"data",omitempty`
 }
 
-@server (
-	jwt:        Auth
-	middleware: AdminCheck
+@server(
+    jwt: Auth
+    middleware: AdminCheck
 )
 service user-api {
-	@handler SetStatus
-	post /v1/user/setstatus (SetStatusReq) returns (SetStatusResp)
+    @handler SetStatus
+    post /v1/user/setstatus (SetStatusReq) returns (SetStatusResp)
 }
 
-@server (
-	jwt: Auth
+@server(
+    jwt: Auth
 )
 service user-api {
-	@handler UpdateToken
-	get /v1/user/updatetoken returns (UpdateTokenResp)
+    @handler UpdateToken
+    get /v1/user/updatetoken returns (UpdateTokenResp)
 
-	@handler UpdateInfo
-	post /v1/user/updateinfo (UpdateInfoReq) returns (UpdateInfoResp)
+    @handler UpdateInfo
+    post /v1/user/updateinfo (UpdateInfoReq) returns (UpdateInfoResp)
 
-	@handler ShowMyInfo
-	post /v1/user/myinfo returns (UserInfoResp)
+    @handler ShowMyInfo
+    post /v1/user/myinfo returns (UserInfoResp)
 }
 

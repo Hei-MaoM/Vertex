@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import type {User} from '../types';
-import { userApi } from '../lib/api';
-import { UserCircle, Settings, LogOut } from 'lucide-react';
+import {userApi} from '../lib/api';
+import {LogOut, Settings, UserCircle} from 'lucide-react';
 
 interface UserCardProps {
     onShowLogin: () => void;
@@ -13,7 +13,7 @@ interface UserCardProps {
     onGoProfile?: () => void;
 }
 
-export const UserCard = ({ onShowLogin, onEditProfile, refreshTrigger, onUserLoaded, onGoProfile }: UserCardProps) => {
+export const UserCard = ({onShowLogin, onEditProfile, refreshTrigger, onUserLoaded, onGoProfile}: UserCardProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -60,15 +60,16 @@ export const UserCard = ({ onShowLogin, onEditProfile, refreshTrigger, onUserLoa
     };
 
     if (loading && localStorage.getItem('jwt_token')) {
-        return <div className="h-48 bg-gray-100 rounded-xl animate-pulse" />;
+        return <div className="h-48 bg-gray-100 rounded-xl animate-pulse"/>;
     }
 
     if (!user) {
         return (
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
-                <UserCircle className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                <UserCircle className="w-16 h-16 mx-auto text-gray-300 mb-4"/>
                 <p className="text-gray-500 mb-4">加入 Vertex 社区</p>
-                <button onClick={onShowLogin} className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                <button onClick={onShowLogin}
+                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
                     登录 / 注册
                 </button>
             </div>
@@ -124,10 +125,11 @@ export const UserCard = ({ onShowLogin, onEditProfile, refreshTrigger, onUserLoa
                         onClick={() => onEditProfile(user)}
                         className="w-full flex items-center justify-center gap-2 text-gray-600 hover:bg-gray-50 py-2 rounded-lg text-sm transition"
                     >
-                        <Settings size={16} /> 编辑资料
+                        <Settings size={16}/> 编辑资料
                     </button>
-                    <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 text-red-500 hover:bg-red-50 py-2 rounded-lg text-sm">
-                        <LogOut size={16} /> 退出登录
+                    <button onClick={handleLogout}
+                            className="w-full flex items-center justify-center gap-2 text-red-500 hover:bg-red-50 py-2 rounded-lg text-sm">
+                        <LogOut size={16}/> 退出登录
                     </button>
                 </div>
             </div>
