@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Check, Loader2, X, Plus} from 'lucide-react'; // 引入 Plus 图标
+import {Check, Loader2, Plus, X} from 'lucide-react'; // 引入 Plus 图标
 import {problemApi} from '../lib/api';
 import type {CommonResp, Tag} from '../types';
 
@@ -119,7 +119,8 @@ export const PublishModal = ({isOpen, onClose, onSuccess}: PublishModalProps) =>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="col-span-2">
                             <label className="text-sm font-medium text-gray-700">原题链接 (URL)</label>
-                            <input name="problem_url" required type="url" placeholder="例如: https://leetcode.cn/problems/..."
+                            <input name="problem_url" required type="url"
+                                   placeholder="例如: https://leetcode.cn/problems/..."
                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                    onChange={handleChange}/>
                         </div>
@@ -151,7 +152,8 @@ export const PublishModal = ({isOpen, onClose, onSuccess}: PublishModalProps) =>
                         <label className="text-sm font-medium text-gray-700">选择标签</label>
 
                         {/* 1. 已选中的标签展示区 (Selected Chips) */}
-                        <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg border border-gray-200 border-dashed">
+                        <div
+                            className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg border border-gray-200 border-dashed">
                             {formData.tag_ids.length === 0 && (
                                 <span className="text-sm text-gray-400 self-center pl-1">暂未选择标签...</span>
                             )}
@@ -166,7 +168,7 @@ export const PublishModal = ({isOpen, onClose, onSuccess}: PublishModalProps) =>
                                         className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-md flex items-center gap-1 transition"
                                     >
                                         {tag.name}
-                                        <X size={12} className="text-gray-500" />
+                                        <X size={12} className="text-gray-500"/>
                                     </button>
                                 );
                             })}
@@ -208,7 +210,7 @@ export const PublishModal = ({isOpen, onClose, onSuccess}: PublishModalProps) =>
                                                     : 'border-gray-200 text-gray-600 hover:border-blue-300 hover:text-blue-600'
                                                 }`}
                                             >
-                                                {isSelected ? <Check size={14} /> : <Plus size={14} />}
+                                                {isSelected ? <Check size={14}/> : <Plus size={14}/>}
                                                 {tag.name}
                                             </button>
                                         );

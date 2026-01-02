@@ -44,13 +44,13 @@ type TagListResp {
 }
 
 type ProblemPost {
-	Id       int64   `json:"id"`
-	Title    string  `json:"title"`
-	Source   string  `json:"source"`
-	Score    float64 `json:"score"`
-	Tags     string  `json:"tags"`
-	IsSolved bool    `json:"is_solved"`
-	AuthorId int64   `json:"authorid"`
+    Id int64 `json:"id"`
+    Title string `json:"title"`
+    Source string `json:"source"`
+    Score float64 `json:"score"`
+    Tags string `json:"tags"`
+    IsSolved bool `json:"is_solved"`
+    AuthorId int64 `json:"authorid"`
 }
 
 type ListResp {
@@ -81,7 +81,7 @@ type ProblemDetail {
 	Source     string `json:"source"`
 	IsSolved   bool   `json:"is_solved"` // 当前用户是否已打卡该题
 	ProblemUrl string `json:"problem_url"` // 原题链接 (需要关联查 problem 表)
-	ViewNum    int64  `json:"view_num"`
+    ViewNum int64 `json:"view_num"`
 }
 
 type GetProblemDetailResp {
@@ -98,33 +98,33 @@ service problem-api {
 }
 
 type GetMyPostsReq {
-	Page     int64 `form:"page,default=1"`
-	PageSize int64 `form:"page_size,default=20"`
-	Status   int64 `form:"status,default=-1"` // -1:全部, 0:待审, 1:已发, 2:撤销
+    Page int64 `form:"page,default=1"`
+    PageSize int64 `form:"page_size,default=20"`
+    Status int64 `form:"status,default=-1"` // -1:全部, 0:待审, 1:已发, 2:撤销
 }
 
 type ProblemIdReq {
-	Id int64 `json:"id"`
+    Id int64 `json:"id"`
 }
 
 type CollectReq {
-	Id     int64  `json:"id"`
-	Action string `json:"action"`
+    Id int64 `json:"id"`
+    Action string `json:"action"`
 }
 
 type GetProblemIdReq {
-	Id int64 `form:"id"`
+    Id int64 `form:"id"`
 }
 
 @server (
 	jwt: Auth
 )
 service problem-api {
-	@handler Collect
-	post /v1/problem/collect (CollectReq) returns (CommonResp)
+    @handler Collect
+    post /v1/problem/collect (CollectReq) returns (CommonResp)
 
-	@handler getCollect
-	get /v1/problem/getcollect (GetProblemIdReq) returns (CommonResp)
+    @handler getCollect
+    get /v1/problem/getcollect (GetProblemIdReq) returns (CommonResp)
 
 	@handler Publish
 	post /v1/problem/publish (PublishReq) returns (CommonResp) // 发布题目
@@ -135,14 +135,14 @@ service problem-api {
 	@handler GetProblemDetail
 	get /v1/problem/detail (GetProblemDetailReq) returns (GetProblemDetailResp)
 
-	@handler GetMyPosts
-	get /v1/problem/myposts (GetMyPostsReq) returns (ListResp)
+    @handler GetMyPosts
+    get /v1/problem/myposts (GetMyPostsReq) returns (ListResp)
 
-	@handler DeletePost
-	post /v1/problem/delete (ProblemIdReq) returns (CommonResp)
+    @handler DeletePost
+    post /v1/problem/delete (ProblemIdReq) returns (CommonResp)
 
-	@handler Solve
-	post /v1/problem/solve (ProblemIdReq) returns (CommonResp)
+    @handler Solve
+    post /v1/problem/solve (ProblemIdReq) returns (CommonResp)
 }
 
 @server (

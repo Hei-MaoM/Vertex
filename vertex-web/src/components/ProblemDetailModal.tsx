@@ -38,11 +38,11 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) 
                 // 这样比串行请求更快，且逻辑分离
                 const [detailRes, collectRes] = await Promise.all([
                     problemApi.get<CommonResp<ProblemDetail>>('/v1/problem/detail', {
-                        params: { id: problemId }
+                        params: {id: problemId}
                     }),
                     // 调用您新写的 getCollect 接口
                     problemApi.get<CommonResp<boolean>>('/v1/problem/getcollect', {
-                        params: { id: problemId }
+                        params: {id: problemId}
                     })
                 ]);
 
@@ -212,7 +212,8 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) 
 
                 {/* Bottom Action Bar */}
                 {!loading && !error && (
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                    <div
+                        className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
 
                         {/* 左侧：收藏按钮 */}
                         <button

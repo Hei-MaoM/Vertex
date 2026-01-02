@@ -5,10 +5,11 @@ import (
 	"context"
 	"strconv"
 
+	"time"
+
 	rediss "github.com/redis/go-redis/v9"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
-	"time"
 )
 
 func StartConsumers(svcCtx *svc.ServiceContext) {
