@@ -10,7 +10,7 @@ import {AuditDetailModal} from './components/AuditDetailModal';
 import {ProfilePage} from './components/ProfilePage'; // ✨ 引入个人主页组件
 import {LayoutGrid, Plus, Search, ShieldCheck, User as UserIcon} from 'lucide-react';
 import type {User} from './types';
-
+import {LeaderboardCard} from './components/LeaderboardCard';
 function App() {
     // 路由状态：home | admin | profile
     const [currentPage, setCurrentPage] = useState<'home' | 'admin' | 'profile'>('home');
@@ -145,6 +145,7 @@ function App() {
                                 <h3 className="font-bold text-gray-800 mb-2">📢 社区公告</h3>
                                 <p className="text-sm text-gray-500">Vertex V1.0 正式公测！欢迎发布原创算法题解。</p>
                             </div>
+                            <LeaderboardCard />
                         </aside>
                     </div>
                 )}

@@ -27,7 +27,7 @@ func NewDeletePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 	}
 }
 
-func (l *DeletePostLogic) DeletePost(req *types.DeletePostReq) (resp *types.CommonResp, err error) {
+func (l *DeletePostLogic) DeletePost(req *types.ProblemIdReq) (resp *types.CommonResp, err error) {
 	userId, err := l.ctx.Value("id").(json.Number).Int64()
 	if err != nil {
 		return &types.CommonResp{
@@ -52,6 +52,14 @@ func (l *DeletePostLogic) DeletePost(req *types.DeletePostReq) (resp *types.Comm
 		}, nil
 	}
 	l.svcCtx.ProblemPostModel.Delete(l.ctx, uint64(req.Id))
+	if problem.Status == 1 {
+		streamKey := "stream:post"
+		message := map[string]interface{}{
+			"user_id": problem.UserId,
+			"action":  "remove",
+		}
+		_, err = l.svcCtx.Redis.XAddCtx(l.ctx, streamKey, false, "*", message)
+	}
 	return &types.CommonResp{
 		Status: 200,
 		Msg:    "ok",

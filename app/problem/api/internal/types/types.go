@@ -9,15 +9,16 @@ type AuditReq struct {
 	FixProblemTitle string `json:"fix_problem_title"`
 }
 
+type CollectReq struct {
+	Id     int64  `json:"id"`
+	Action string `json:"action"`
+}
+
 type CommonResp struct {
 	Status int32       `json:"status"`
 	Msg    string      `json:"msg"`
 	Error  string      `json:"error",omitempty`
 	Data   interface{} `json:"data",omitempty`
-}
-
-type DeletePostReq struct {
-	Id int64 `json:"id"`
 }
 
 type GetMyPostsReq struct {
@@ -36,6 +37,10 @@ type GetProblemDetailResp struct {
 	Error  string        `json:"error",omitempty`
 	Total  int64         `json:"total"`
 	Data   ProblemDetail `json:"data",omitempty`
+}
+
+type GetProblemIdReq struct {
+	Id int64 `form:"id"`
 }
 
 type ListReq struct {
@@ -65,6 +70,10 @@ type ProblemDetail struct {
 	ViewNum    int64  `json:"view_num"`
 }
 
+type ProblemIdReq struct {
+	Id int64 `json:"id"`
+}
+
 type ProblemPost struct {
 	Id       int64   `json:"id"`
 	Title    string  `json:"title"`
@@ -83,10 +92,6 @@ type PublishReq struct {
 	Title         string  `json:"title"`
 	Content       string  `json:"content"`
 	Solution      string  `json:"solution"`
-}
-
-type SolveProblemReq struct {
-	Id int64 `json:"id"`
 }
 
 type Tag struct {

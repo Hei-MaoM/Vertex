@@ -80,3 +80,11 @@ export interface UploadTokenResp {
 export interface SolveReq {
     id: number; // 注意：后端是 Id (PostId)，前端传 id
 }
+
+export interface LeaderboardUser {
+    id: number;
+    username: string;
+    avatar: string;
+    collectcnt: number; // 注意：后端返回字段名要对齐 (collectcnt vs solvecnt)
+    rank: number;
+}

@@ -10,6 +10,19 @@ type CommonResp struct {
 	Data   interface{} `json:"data",omitempty`
 }
 
+type LeaderboardResp struct {
+	Status int32             `json:"status"`
+	Data   []LeaderboardUser `json:"data"`
+}
+
+type LeaderboardUser struct {
+	Id         int64  `json:"id"`
+	Username   string `json:"username"`
+	Avatar     string `json:"avatar"`
+	CollectCnt int64  `json:"collectcnt"`
+	Rank       int    `json:"rank"` // 排名
+}
+
 type LoginReq struct {
 	UserName string `json:"user_name" form:"user_name"`
 	Password string `json:"password" form:"password"`

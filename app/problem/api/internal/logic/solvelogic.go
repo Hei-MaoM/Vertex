@@ -29,7 +29,7 @@ func NewSolveLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SolveLogic 
 	}
 }
 
-func (l *SolveLogic) Solve(req *types.SolveProblemReq) (resp *types.CommonResp, err error) {
+func (l *SolveLogic) Solve(req *types.ProblemIdReq) (resp *types.CommonResp, err error) {
 	userId, err := l.ctx.Value("id").(json.Number).Int64()
 	if err != nil {
 		return &types.CommonResp{
@@ -44,6 +44,13 @@ func (l *SolveLogic) Solve(req *types.SolveProblemReq) (resp *types.CommonResp, 
 		ProblemId: uint64(problem),
 		CreatedAt: time.Time{},
 	})
+	streamKey := "stream:solve"
+
+	message := map[string]interface{}{
+		"user_id": userId,
+		"action":  "add",
+	}
+	_, err = l.svcCtx.Redis.XAddCtx(l.ctx, streamKey, false, "*", message)
 	return &types.CommonResp{
 		Status: 200,
 		Msg:    "ok",

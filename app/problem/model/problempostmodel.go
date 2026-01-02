@@ -22,6 +22,7 @@ type (
 		CountProbleming(ctx context.Context) (int64, error)
 		UpdateViewNum(ctx context.Context, id, viewNum int64) error
 		FindPosts(ctx context.Context, userId, status, page, pageSize int64) ([]*ProblemPost, int64, error)
+		UpdateCollectCount(ctx context.Context, uid uint64, delta int) error
 	}
 
 	customProblemPostModel struct {
@@ -66,11 +67,10 @@ func (m *customProblemPostModel) FindApproved(ctx context.Context, page, pageSiz
 	return resp, nil
 }
 func (m *customProblemPostModel) UpdateViewNum(ctx context.Context, id, viewNum int64) error {
-	problemPostIdKey := fmt.Sprintf("%s%v", cacheProblemPostIdPrefix, id)
-	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("update %s set view_num = ? where `id` = ?", m.table)
+	query := fmt.Sprintf("UPDATE problem_post SET view_num = ? WHERE id = ?")
+	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (sql.Result, error) {
 		return conn.ExecCtx(ctx, query, viewNum, id)
-	}, problemPostIdKey)
+	})
 	return err
 }
 
@@ -97,4 +97,11 @@ func (m *customProblemPostModel) FindPosts(ctx context.Context, userId, status, 
 	err := m.CachedConn.QueryRowsNoCacheCtx(ctx, &resp, query, args...)
 
 	return resp, total, err
+}
+func (m *customProblemPostModel) UpdateCollectCount(ctx context.Context, id uint64, delta int) error {
+	query := fmt.Sprintf("UPDATE problem_post SET collect_num = collect_num + ? WHERE id = ?")
+	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (sql.Result, error) {
+		return conn.ExecCtx(ctx, query, delta, id)
+	})
+	return err
 }

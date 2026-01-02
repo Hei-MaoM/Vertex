@@ -13,16 +13,16 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func DeletePostHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func getCollectHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.ProblemIdReq
+		var req types.GetProblemIdReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := logic.NewDeletePostLogic(r.Context(), svcCtx)
-		resp, err := l.DeletePost(&req)
+		l := logic.NewGetCollectLogic(r.Context(), svcCtx)
+		resp, err := l.GetCollect(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

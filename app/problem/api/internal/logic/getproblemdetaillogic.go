@@ -66,7 +66,7 @@ func (l *GetProblemDetailLogic) GetProblemDetail(req *types.GetProblemDetailReq)
 	if rand.Intn(10) == 0 {
 		p.ViewNum = uint64(newView)
 		go func(pid, views int64) {
-			err := l.svcCtx.ProblemPostModel.UpdateViewNum(l.ctx, pid, views)
+			err := l.svcCtx.ProblemPostModel.UpdateViewNum(context.Background(), pid, views)
 			if err != nil {
 				logx.Errorf("Async update view_num failed (id=%d): %v", pid, err)
 			}

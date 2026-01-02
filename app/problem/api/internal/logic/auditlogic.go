@@ -71,6 +71,16 @@ func (l *AuditLogic) Audit(req *types.AuditReq) (resp *types.CommonResp, err err
 			Msg:    "审核失败，状态码错误",
 		}, nil
 	}
+	if req.Status == 1 {
+		streamKey := "stream:post"
+		problem, _ := l.svcCtx.ProblemPostModel.FindOne(l.ctx, uint64(problemPost.Id))
+
+		message := map[string]interface{}{
+			"user_id": problem.UserId,
+			"action":  "add",
+		}
+		_, err = l.svcCtx.Redis.XAddCtx(l.ctx, streamKey, false, "*", message)
+	}
 	return &types.CommonResp{
 		Status: int32(code),
 		Msg:    "审核成功",

@@ -1,69 +1,128 @@
 import {useEffect, useState} from 'react';
-import {CheckCircle2, ExternalLink, Eye, Loader2, X, XCircle} from 'lucide-react';
+import {CheckCircle2, ExternalLink, Eye, Loader2, Star, X, XCircle} from 'lucide-react';
 import {problemApi} from '../lib/api';
+// 确保您的 types.ts 里有这些定义
 import type {CommonResp, ProblemDetail} from '../types';
 
 interface Props {
     problemId: number | null;
     onClose: () => void;
-    // ✨ 新增回调：打卡成功后，通知父组件刷新列表（让列表上的对勾也亮起来）
+    // 打卡成功回调，通知父组件刷新列表
     onSolveSuccess?: () => void;
 }
 
 export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) => {
+    // 数据状态
     const [detail, setDetail] = useState<ProblemDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // ✨ 本地状态：是否已解决 (为了即时更新 UI)
+    // 交互状态
     const [isSolved, setIsSolved] = useState(false);
     const [solving, setSolving] = useState(false);
 
+    // 收藏状态
+    const [isCollected, setIsCollected] = useState(false);
+    const [collecting, setCollecting] = useState(false);
+
+    // 初始化加载数据
     useEffect(() => {
         if (!problemId) return;
 
-        const fetchDetail = async () => {
-            try {
-                setLoading(true);
-                setError("");
-                const res = await problemApi.get<any>('/v1/problem/detail', {
-                    params: { id: problemId }
-                });
-                const status = res.data.status ?? res.data.Status;
-                const data = res.data.data ?? res.data.Data;
+        const fetchData = async () => {
+            setLoading(true);
+            setError("");
 
-                if (status === 0 || status === 200) {
+            try {
+                // 并行请求：题目详情 + 收藏状态
+                // 这样比串行请求更快，且逻辑分离
+                const [detailRes, collectRes] = await Promise.all([
+                    problemApi.get<CommonResp<ProblemDetail>>('/v1/problem/detail', {
+                        params: { id: problemId }
+                    }),
+                    // 调用您新写的 getCollect 接口
+                    problemApi.get<CommonResp<boolean>>('/v1/problem/getcollect', {
+                        params: { id: problemId }
+                    })
+                ]);
+
+                // 1. 处理详情数据
+                if (detailRes.data.status === 0 || detailRes.data.status === 200) {
+                    // 兼容后端可能返回 Data 或 data
+                    const data = detailRes.data.data;
                     setDetail(data);
-                    setIsSolved(data.is_solved); // ✨ 初始化状态
+                    setIsSolved(data.is_solved);
                 } else {
-                    setError(res.data.msg || "加载失败");
+                    throw new Error(detailRes.data.msg || "加载题目详情失败");
                 }
+
+                // 2. 处理收藏状态
+                // 您的后端 Logic 返回 Data: true/false
+                if (collectRes.data.status === 0 || collectRes.data.status === 200) {
+                    setIsCollected(collectRes.data.data);
+                }
+                // 如果收藏接口失败（比如未登录状态下可能无法查），这里可以选择忽略或记录日志，
+                // 不建议阻断详情页的展示，所以这里不 throw error
+
             } catch (err: any) {
-                setError(err.response?.data?.msg || "获取详情失败，请先登录");
+                console.error("加载数据失败", err);
+                setError(err.message || err.response?.data?.msg || "获取数据失败");
             } finally {
                 setLoading(false);
             }
         };
-        fetchDetail();
+
+        fetchData();
     }, [problemId]);
 
-    // ✨ 打卡逻辑
-    const handleSolve = async () => {
-        if (isSolved) return; // 已完成的不处理
+    // 收藏/取消收藏逻辑
+    const handleCollect = async () => {
+        if (!problemId || collecting) return;
 
+        // 乐观更新：立即在 UI 上切换状态，不用等网络返回
+        const targetStatus = !isCollected;
+        setIsCollected(targetStatus);
+        setCollecting(true);
+
+        try {
+            // 根据目标状态决定 action
+            const action = targetStatus ? 'add' : 'remove';
+
+            const res = await problemApi.post<CommonResp>('/v1/problem/collect', {
+                id: problemId,
+                action: action
+            });
+
+            if (res.data.status !== 0 && res.data.status !== 200) {
+                // 如果后端返回失败，回滚状态
+                setIsCollected(!targetStatus);
+                alert("收藏操作失败: " + res.data.msg);
+            }
+        } catch (err: any) {
+            // 网络错误，回滚状态
+            setIsCollected(!targetStatus);
+            console.error("收藏请求失败", err);
+            alert("操作失败，请重试");
+        } finally {
+            setCollecting(false);
+        }
+    };
+
+    // 打卡逻辑
+    const handleSolve = async () => {
+        if (isSolved) return;
         if (!window.confirm("恭喜你解决了这道题！确定要标记为“已完成”吗？")) return;
 
         try {
             setSolving(true);
-            // 调用 Solve 接口
             const res = await problemApi.post<CommonResp>('/v1/problem/solve', {
-                id: problemId // 传 PostId 给后端
+                id: problemId
             });
 
             if (res.data.status === 0 || res.data.status === 200) {
                 alert("打卡成功！🎉");
-                setIsSolved(true); // 变绿
-                if (onSolveSuccess) onSolveSuccess(); // 通知列表刷新
+                setIsSolved(true);
+                if (onSolveSuccess) onSolveSuccess();
             } else {
                 alert("操作失败: " + res.data.msg);
             }
@@ -90,8 +149,8 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) 
                     </button>
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto p-8 pb-24">
+                {/* Content Area */}
+                <div className="flex-1 overflow-y-auto p-8 pb-24 scrollbar-thin scrollbar-thumb-gray-200">
                     {loading ? (
                         <div className="h-full flex items-center justify-center">
                             <Loader2 className="animate-spin text-blue-500 w-10 h-10" />
@@ -103,12 +162,12 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) 
                         </div>
                     ) : detail && (
                         <div className="space-y-8">
-                            {/* Title Area */}
+                            {/* Title & Metadata */}
                             <div>
                                 <div className="flex items-center gap-3 mb-3 flex-wrap">
-                      <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-sm font-bold">
-                        {detail.source || "原创"}
-                      </span>
+                                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-sm font-bold">
+                                        {detail.source || "原创"}
+                                    </span>
                                     <h1 className="text-3xl font-black text-gray-900">{detail.title}</h1>
                                 </div>
 
@@ -130,7 +189,7 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) 
                                 </div>
                             </div>
 
-                            {/* Body */}
+                            {/* Problem Content */}
                             <div className="prose max-w-none">
                                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-blue-500 pl-3">题目内容</h3>
                                 <div className="bg-gray-50 p-6 rounded-xl text-gray-700 whitespace-pre-wrap leading-relaxed border border-gray-100">
@@ -138,7 +197,7 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) 
                                 </div>
                             </div>
 
-                            {/* Solution */}
+                            {/* Solution Code */}
                             {detail.solution && (
                                 <div className="prose max-w-none">
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-green-500 pl-3">参考代码</h3>
@@ -151,21 +210,42 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess}: Props) 
                     )}
                 </div>
 
-                {/* ✨✨✨ 底部固定操作栏 (打卡按钮) ✨✨✨ */}
+                {/* Bottom Action Bar */}
                 {!loading && !error && (
-                    <div
-                        className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-end gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+
+                        {/* 左侧：收藏按钮 */}
+                        <button
+                            onClick={handleCollect}
+                            disabled={collecting}
+                            className={`
+                                flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors
+                                ${isCollected
+                                ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100'
+                                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                            }
+                                ${collecting ? 'opacity-70 cursor-wait' : ''}
+                            `}
+                        >
+                            <Star
+                                size={20}
+                                className={isCollected ? "fill-yellow-500" : ""}
+                            />
+                            {isCollected ? "已收藏" : "收藏"}
+                        </button>
+
+                        {/* 右侧：打卡按钮 */}
                         <button
                             onClick={handleSolve}
                             disabled={isSolved || solving}
                             className={`
-                        px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition shadow-sm
-                        ${isSolved
+                                px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition shadow-sm
+                                ${isSolved
                                 ? 'bg-green-100 text-green-700 cursor-default border border-green-200'
                                 : 'bg-red-500 text-white hover:bg-red-600 active:scale-95'
                             }
-                        ${solving ? 'opacity-70 cursor-wait' : ''}
-                    `}
+                                ${solving ? 'opacity-70 cursor-wait' : ''}
+                            `}
                         >
                             {solving ? (
                                 <Loader2 className="animate-spin" size={20}/>

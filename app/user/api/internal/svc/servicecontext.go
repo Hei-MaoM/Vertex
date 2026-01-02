@@ -8,6 +8,7 @@ import (
 	"Vertex/app/user/api/internal/middleware"
 	"Vertex/app/user/model"
 	"Vertex/pkg/email"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
@@ -36,7 +37,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	return &ServiceContext{
 		Config:          c,
-		UserModel:       model.NewUsersModel(conn, c.CacheRedis),
+		UserModel:       model.NewUsersModel(conn, c.CacheRedis, time.Hour),
 		Redis:           rds,
 		EmailSender:     email.NewEmailSender(emailConf),
 		AdminCheck:      middleware.NewAdminCheckMiddleware().Handle,
