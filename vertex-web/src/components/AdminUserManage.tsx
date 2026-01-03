@@ -77,7 +77,8 @@ export const AdminUserManage = ({currentUser}: Props) => {
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">用户管理控制台</h2>
                     <p className="text-sm text-gray-400">
-                        当前身份: <span className="font-bold text-purple-600">{isSuperAdmin ? "超级管理员 (Lv.3)" : "管理员 (Lv.2)"}</span>
+                        当前身份: <span
+                        className="font-bold text-purple-600">{isSuperAdmin ? "超级管理员 (Lv.3)" : "管理员 (Lv.2)"}</span>
                     </p>
                 </div>
             </div>
@@ -108,7 +109,7 @@ export const AdminUserManage = ({currentUser}: Props) => {
                         {/* 如果不是超管，加个蒙层或者锁图标 */}
                         {!isSuperAdmin && (
                             <div className="absolute top-2 right-2 text-gray-400">
-                                <Lock size={16} />
+                                <Lock size={16}/>
                             </div>
                         )}
 
@@ -144,7 +145,8 @@ export const AdminUserManage = ({currentUser}: Props) => {
                     </div>
 
                     {/* 封禁卡片 (所有人可用) */}
-                    <div className="p-5 rounded-xl border-2 border-red-100 bg-red-50/50 hover:border-red-200 transition-all">
+                    <div
+                        className="p-5 rounded-xl border-2 border-red-100 bg-red-50/50 hover:border-red-200 transition-all">
                         <div className="flex items-center gap-2 mb-4">
                             <ShieldAlert size={18} className="text-red-600"/>
                             <h3 className="font-bold text-gray-700">账号状态</h3>
@@ -156,7 +158,7 @@ export const AdminUserManage = ({currentUser}: Props) => {
                                 disabled={managing}
                                 className="bg-white border border-red-200 text-red-600 py-2 rounded-lg font-medium hover:bg-red-50 flex flex-col items-center justify-center gap-1 transition"
                             >
-                                <Ban size={18} />
+                                <Ban size={18}/>
                                 <span className="text-xs">封禁账号</span>
                             </button>
                             <button
@@ -164,7 +166,7 @@ export const AdminUserManage = ({currentUser}: Props) => {
                                 disabled={managing}
                                 className="bg-white border border-green-200 text-green-600 py-2 rounded-lg font-medium hover:bg-green-50 flex flex-col items-center justify-center gap-1 transition"
                             >
-                                <CheckCircle size={18} />
+                                <CheckCircle size={18}/>
                                 <span className="text-xs">解封恢复</span>
                             </button>
                         </div>

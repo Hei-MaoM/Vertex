@@ -5,6 +5,7 @@ import {problemApi} from '../lib/api';
 import {AuthorBadge} from './AuthorBadge';
 import type {CommonResp, ProblemDetail} from '../types';
 import {MarkdownViewer} from './MarkdownViewer.tsx';
+
 interface Props {
     problemId: number | null;
     onClose: () => void;
@@ -42,11 +43,11 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess, onUserCl
                 const [detailRes, collectRes] = await Promise.all([
                     // 1. 获取题目详情
                     problemApi.get<CommonResp<ProblemDetail>>('/v1/problem/detail', {
-                        params: { id: problemId }
+                        params: {id: problemId}
                     }),
                     // 2. 获取收藏状态 (注意 URL 大小写需与后端 API 定义一致)
                     problemApi.get<CommonResp<boolean>>('/v1/problem/getcollect', {
-                        params: { id: problemId }
+                        params: {id: problemId}
                     })
                 ]);
 
@@ -164,7 +165,8 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess, onUserCl
                             {/* Title & Author Info */}
                             <div>
                                 <div className="flex items-center gap-3 mb-4 flex-wrap">
-                                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-sm font-bold self-start mt-1">
+                                    <span
+                                        className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-sm font-bold self-start mt-1">
                                         {detail.source || "原创"}
                                     </span>
                                     <h1 className="text-3xl font-black text-gray-900 leading-tight">
@@ -178,11 +180,12 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess, onUserCl
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm text-gray-400">发布者</span>
                                         {/* 使用 AuthorBadge 组件 */}
-                                        <AuthorBadge userId={detail.author_id} onClick={onUserClick} />
+                                        <AuthorBadge userId={detail.author_id} onClick={onUserClick}/>
                                     </div>
 
                                     {/* 浏览量 */}
-                                    <div className="flex items-center gap-1.5 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
+                                    <div
+                                        className="flex items-center gap-1.5 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
                                         <Eye size={14}/>
                                         <span>{detail.view_num || 0} 浏览</span>
                                     </div>
@@ -211,7 +214,7 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess, onUserCl
 
                                 {/* ✨✨✨ 使用 MarkdownViewer 渲染内容 ✨✨✨ */}
                                 <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 min-h-[100px]">
-                                    <MarkdownViewer content={detail.content || "暂无内容"} />
+                                    <MarkdownViewer content={detail.content || "暂无内容"}/>
                                 </div>
                             </div>
                             {/* Solution Code */}
@@ -222,7 +225,8 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess, onUserCl
                                         参考代码
                                     </h3>
                                     <div className="bg-[#1e1e1e] text-gray-200 p-6 rounded-xl font-mono text-sm overflow-x-auto shadow-inner border border-gray-800 relative group">
-                                        <div className="absolute top-2 right-4 text-xs text-gray-500 select-none">CODE</div>
+                                        <div className="absolute top-2 right-4 text-xs text-gray-500 select-none">CODE
+                                        </div>
                                         <pre className="whitespace-pre">{detail.solution}</pre>
                                     </div>
                                 </div>
@@ -233,14 +237,15 @@ export const ProblemDetailModal = ({problemId, onClose, onSolveSuccess, onUserCl
 
                 {/* Bottom Action Bar */}
                 {!loading && !error && (
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                    <div
+                        className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                         {/* 左侧：收藏按钮 */}
                         <button
                             onClick={handleCollect}
                             disabled={collecting}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${isCollected ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'} ${collecting ? 'opacity-70 cursor-wait' : ''}`}
                         >
-                            <Star size={20} className={isCollected ? "fill-yellow-500" : ""} />
+                            <Star size={20} className={isCollected ? "fill-yellow-500" : ""}/>
                             {isCollected ? "已收藏" : "收藏"}
                         </button>
 

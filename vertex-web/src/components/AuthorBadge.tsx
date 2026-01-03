@@ -7,21 +7,22 @@ interface Props {
     onClick?: (id: number) => void; // ✨ 接收点击回调
 }
 
-export const AuthorBadge = ({ userId, onClick }: Props) => {
+export const AuthorBadge = ({userId, onClick}: Props) => {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         if (!userId) return;
         // 简单请求用户信息 (实际项目中可以使用 react-query 缓存)
         userApi.get<CommonResp<User>>('/v1/user/showinfo', {
-            params: { id: userId }
+            params: {id: userId}
         })
             .then(res => {
                 if (res.data.status === 0 || res.data.status === 200) {
                     setUser(res.data.data);
                 }
             })
-            .catch(() => {});
+            .catch(() => {
+            });
     }, [userId]);
 
     if (!user) {

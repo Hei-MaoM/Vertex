@@ -9,7 +9,7 @@ interface Props {
     onUserClick?: (id: number) => void; // ✨ 新增：接收用户点击回调
 }
 
-export const ProblemFeed = ({ onItemClick, onUserClick }: Props) => {
+export const ProblemFeed = ({onItemClick, onUserClick}: Props) => {
     const [problems, setProblems] = useState<ProblemPost[]>([]);
     const [loading, setLoading] = useState(true);
     const [debugMsg, setDebugMsg] = useState("");
@@ -66,7 +66,8 @@ export const ProblemFeed = ({ onItemClick, onUserClick }: Props) => {
                                 <h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition line-clamp-1">
                                     {item.title}
                                 </h3>
-                                {item.is_solved && <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-50 flex-shrink-0" />}
+                                {item.is_solved &&
+                                    <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-50 flex-shrink-0"/>}
                             </div>
 
                             {/* ✨ Author Info (点击事件在这里处理) */}

@@ -1,9 +1,8 @@
-import {useState, useEffect} from 'react';
-import {BrowserRouter, Routes, Route, useNavigate, useLocation} from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {BrowserRouter, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {LayoutGrid, Loader2, Plus, Search, ShieldCheck, User as UserIcon} from 'lucide-react';
 
 // === 组件引入 ===
-
 import {LoginModal} from './components/LoginModal';
 import {EditProfileModal} from './components/EditProfileModal';
 // ❌ 已移除 PublishModal import
@@ -16,7 +15,6 @@ import {OtherUser} from './pages/OtherUser';
 import {ProblemDetailPage} from './pages/ProblemDetailPage';
 import {PublishPage} from './pages/PublishPage'; // ✨ 新增：独立发布页
 import {ProfilePage} from './components/ProfilePage'; // 我的主页 (复用组件)
-
 // === API & Types ===
 import {userApi} from './lib/api';
 import type {CommonResp, User} from './types';
@@ -89,7 +87,7 @@ const Layout = () => {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                    <Loader2 className="w-10 h-10 text-blue-600 animate-spin"/>
                     <p className="text-gray-400 text-sm font-medium">Vertex 启动中...</p>
                 </div>
             </div>
@@ -125,22 +123,26 @@ const Layout = () => {
             <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-8">
-                        <span className="text-2xl font-black text-blue-600 cursor-pointer" onClick={() => navigate('/')}>Vertex</span>
+                        <span className="text-2xl font-black text-blue-600 cursor-pointer"
+                              onClick={() => navigate('/')}>Vertex</span>
 
                         <div className="hidden md:flex gap-6 text-gray-600 font-medium">
-                            <button onClick={() => navigate('/')} className={`flex items-center gap-1 ${location.pathname === '/' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
+                            <button onClick={() => navigate('/')}
+                                    className={`flex items-center gap-1 ${location.pathname === '/' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
                                 <LayoutGrid size={18} /> 题库
                             </button>
 
                             {hasToken && (
-                                <button onClick={() => navigate('/profile')} className={`flex items-center gap-1 ${location.pathname === '/profile' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
+                                <button onClick={() => navigate('/profile')}
+                                        className={`flex items-center gap-1 ${location.pathname === '/profile' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
                                     <UserIcon size={18}/> 我的
                                 </button>
                             )}
 
                             {/* 只有管理员可见 */}
                             {currentUser && currentUser.authority >= 2 && (
-                                <button onClick={() => navigate('/admin')} className={`flex items-center gap-1 ${location.pathname === '/admin' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
+                                <button onClick={() => navigate('/admin')}
+                                        className={`flex items-center gap-1 ${location.pathname === '/admin' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
                                     <ShieldCheck size={18} /> 管理后台
                                 </button>
                             )}
@@ -162,7 +164,8 @@ const Layout = () => {
                             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2" />
                         </div>
                         {!hasToken && (
-                            <button onClick={() => setShowLogin(true)} className="text-sm font-bold text-gray-600 hover:text-blue-600">
+                            <button onClick={() => setShowLogin(true)}
+                                    className="text-sm font-bold text-gray-600 hover:text-blue-600">
                                 登录
                             </button>
                         )}
@@ -184,17 +187,18 @@ const Layout = () => {
                             onItemClick={handleProblemClick}
                             onUserClick={handleViewUser}
                         />
-                    } />
+                    }/>
 
                     {/* 2. 题目详情页 */}
                     <Route path="/problem/:id" element={
-                        <ProblemDetailPage />
-                    } />
+                        <ProblemDetailPage/>
+                    }/>
 
                     {/* 3. 发布页 (✨ 新增路由) */}
                     <Route path="/publish" element={
-                        currentUser ? <PublishPage /> : <div className="p-20 text-center text-gray-400">请先登录后发布</div>
-                    } />
+                        currentUser ? <PublishPage/> :
+                            <div className="p-20 text-center text-gray-400">请先登录后发布</div>
+                    }/>
 
                     {/* 4. 我的主页 */}
                     <Route path="/profile" element={
@@ -208,25 +212,27 @@ const Layout = () => {
                             ) : (
                                 <div className="text-center py-20 text-gray-400 flex flex-col gap-4">
                                     <p>请先登录查看个人主页</p>
-                                    <button onClick={() => setShowLogin(true)} className="text-blue-600 font-bold hover:underline">点击登录</button>
+                                    <button onClick={() => setShowLogin(true)}
+                                            className="text-blue-600 font-bold hover:underline">点击登录
+                                    </button>
                                 </div>
                             )}
                         </div>
-                    } />
+                    }/>
 
                     {/* 5. 他人主页 */}
                     <Route path="/user/:id" element={
-                        <OtherUser onItemClick={handleProblemClick} />
-                    } />
+                        <OtherUser onItemClick={handleProblemClick}/>
+                    }/>
 
                     {/* 6. 管理后台 */}
                     <Route path="/admin" element={
                         currentUser && currentUser.authority >= 2 ? (
-                            <Admin currentUser={currentUser} onReview={handleReviewClick} />
+                            <Admin currentUser={currentUser} onReview={handleReviewClick}/>
                         ) : (
                             <div className="text-center py-20 text-red-400 font-bold">403 - 权限不足</div>
                         )
-                    } />
+                    }/>
                 </Routes>
             </main>
         </div>
@@ -236,7 +242,7 @@ const Layout = () => {
 function App() {
     return (
         <BrowserRouter>
-            <Layout />
+            <Layout/>
         </BrowserRouter>
     );
 }

@@ -25,7 +25,7 @@ export const UserProfilePage = ({userId, onBack, onItemClick}: Props) => {
             setUserLoading(true);
             try {
                 const res = await userApi.get<CommonResp<User>>('/v1/user/showinfo', {
-                    params: { id: userId }
+                    params: {id: userId}
                 });
                 if (res.data.status === 0 || res.data.status === 200) {
                     setUser(res.data.data);
@@ -87,25 +87,29 @@ export const UserProfilePage = ({userId, onBack, onItemClick}: Props) => {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* 顶部导航 */}
-            <button onClick={onBack} className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition group">
-                <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <button onClick={onBack}
+                    className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition group">
+                <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform"/>
                 返回
             </button>
 
             {/* 用户信息卡片 (Header) */}
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-48 overflow-hidden bg-gray-50">
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 opacity-60"></div>
+                    <div
+                        className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 opacity-60"></div>
                     {/* 装饰圆圈 */}
-                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-                    <div className="absolute top-0 -left-4 w-40 h-40 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+                    <div
+                        className="absolute -top-10 -right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                    <div
+                        className="absolute top-0 -left-4 w-40 h-40 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
                 </div>
-
 
 
                 <div className="relative flex flex-col md:flex-row items-center md:items-end gap-6">
                     {/* 头像 */}
-                    <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                    <div
+                        className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-gray-100 overflow-hidden flex-shrink-0">
                         <img
                             src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
                             alt={user.username}
@@ -155,7 +159,7 @@ export const UserProfilePage = ({userId, onBack, onItemClick}: Props) => {
 
                 {postsLoading ? (
                     <div className="p-10 flex justify-center">
-                        <Loader2 className="animate-spin text-gray-400" />
+                        <Loader2 className="animate-spin text-gray-400"/>
                     </div>
                 ) : posts.length === 0 ? (
                     <div className="p-10 text-center text-gray-400 flex flex-col items-center gap-2">
@@ -175,7 +179,8 @@ export const UserProfilePage = ({userId, onBack, onItemClick}: Props) => {
                                         {post.title}
                                     </h4>
                                     {post.is_solved && (
-                                        <span className="text-green-500 text-xs font-bold bg-green-50 px-2 py-0.5 rounded-full flex-shrink-0 ml-2">
+                                        <span
+                                            className="text-green-500 text-xs font-bold bg-green-50 px-2 py-0.5 rounded-full flex-shrink-0 ml-2">
                                             已打卡
                                         </span>
                                     )}

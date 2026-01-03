@@ -44,13 +44,13 @@ type TagListResp {
 }
 
 type ProblemPost {
-	Id       int64   `json:"id"`
-	Title    string  `json:"title"`
-	Source   string  `json:"source"`
-	Score    float64 `json:"score"`
-	Tags     string  `json:"tags"`
-	IsSolved bool    `json:"is_solved"`
-	AuthorId int64   `json:"authorid"`
+    Id int64 `json:"id"`
+    Title string `json:"title"`
+    Source string `json:"source"`
+    Score float64 `json:"score"`
+    Tags string `json:"tags"`
+    IsSolved bool `json:"is_solved"`
+    AuthorId int64 `json:"authorid"`
 }
 
 type ListResp {
@@ -81,9 +81,9 @@ type ProblemDetail {
 	Source     string `json:"source"`
 	IsSolved   bool   `json:"is_solved"` // 当前用户是否已打卡该题
 	ProblemUrl string `json:"problem_url"` // 原题链接 (需要关联查 problem 表)
-	AuthorId   int64  `json:"author_id"`
-	ViewNum    int64  `json:"view_num"`
-	Tags       string `json:"tags"`
+    AuthorId int64 `json:"author_id"`
+    ViewNum int64 `json:"view_num"`
+    Tags string `json:"tags"`
 }
 
 type GetProblemDetailResp {
@@ -95,32 +95,32 @@ type GetProblemDetailResp {
 }
 
 type GetPostsReq {
-	Page     int64 `form:"page,default=1"`
-	PageSize int64 `form:"page_size,default=20"`
-	Id       int64 `form:"id"`
+    Page int64 `form:"page,default=1"`
+    PageSize int64 `form:"page_size,default=20"`
+    Id int64 `form:"id"`
 }
 
 service problem-api {
 	@handler ProblemList
 	get /v1/problem/list (ListReq) returns (ListResp)
 
-	@handler ShouOtherPost
-	get /v1/problem/posts (GetPostsReq) returns (ListResp)
+    @handler ShouOtherPost
+    get /v1/problem/posts (GetPostsReq) returns (ListResp)
 }
 
 type GetMyPostsReq {
-	Page     int64 `form:"page,default=1"`
+    Page int64 `form:"page,default=1"`
 	PageSize int64 `form:"page_size,default=20"`
-	Status   int64 `form:"status,default=-1"` // -1:全部, 0:待审, 1:已发, 2:撤销
+    Status int64 `form:"status,default=-1"` // -1:全部, 0:待审, 1:已发, 2:撤销
 }
 
 type ProblemIdReq {
-	Id     int64 `json:"id"`
-	PostId int64 `json:"pid"`
+    Id int64 `json:"id"`
+    PostId int64 `json:"pid"`
 }
 
 type CollectReq {
-	Id     int64  `json:"id"`
+    Id int64 `json:"id"`
 	Action string `json:"action"`
 }
 

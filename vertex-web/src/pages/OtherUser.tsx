@@ -1,4 +1,4 @@
-import {useParams, useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {UserProfilePage} from '../components/UserProfilePage';
 
 interface Props {
@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const OtherUser = ({onItemClick}: Props) => {
-    const { id } = useParams<{id: string}>(); // 从 URL 获取 /user/:id
+    const {id} = useParams<{ id: string }>(); // 从 URL 获取 /user/:id
     const navigate = useNavigate();
 
     if (!id) return null;

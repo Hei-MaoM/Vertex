@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Trophy, Loader2} from 'lucide-react';
+import {Loader2, Trophy} from 'lucide-react';
 import {userApi} from '../lib/api';
 import type {CommonResp} from '../types';
 
@@ -15,7 +15,7 @@ interface Props {
     onUserClick?: (id: number) => void; // ✨ 接收点击回调
 }
 
-export const LeaderboardCard = ({ onUserClick }: Props) => {
+export const LeaderboardCard = ({onUserClick}: Props) => {
     const [list, setList] = useState<LeaderboardUser[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -36,10 +36,12 @@ export const LeaderboardCard = ({ onUserClick }: Props) => {
     }, []);
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[500px]">
+        <div
+            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[500px]">
             {/* Header */}
-            <div className="p-4 border-b border-gray-50 flex items-center gap-2 bg-gradient-to-r from-yellow-50 to-white flex-shrink-0">
-                <Trophy className="text-yellow-500" size={18} />
+            <div
+                className="p-4 border-b border-gray-50 flex items-center gap-2 bg-gradient-to-r from-yellow-50 to-white flex-shrink-0">
+                <Trophy className="text-yellow-500" size={18}/>
                 <h3 className="font-bold text-gray-800">解题风云榜</h3>
             </div>
 
@@ -47,7 +49,7 @@ export const LeaderboardCard = ({ onUserClick }: Props) => {
             <div className="flex-1 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-gray-200">
                 {loading ? (
                     <div className="py-8 flex justify-center text-gray-400">
-                        <Loader2 className="animate-spin" size={20} />
+                        <Loader2 className="animate-spin" size={20}/>
                     </div>
                 ) : list.length === 0 ? (
                     <div className="py-8 text-center text-xs text-gray-400">暂无数据</div>
@@ -79,13 +81,15 @@ export const LeaderboardCard = ({ onUserClick }: Props) => {
                                     />
 
                                     {/* 用户名 */}
-                                    <div className="text-sm font-medium text-gray-700 truncate group-hover:text-blue-600 transition">
+                                    <div
+                                        className="text-sm font-medium text-gray-700 truncate group-hover:text-blue-600 transition">
                                         {user.username}
                                     </div>
                                 </div>
 
                                 {/* 分数 */}
-                                <div className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                                <div
+                                    className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
                                     {user.collectcnt}
                                 </div>
                             </li>
