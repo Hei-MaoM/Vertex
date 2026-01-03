@@ -19,6 +19,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/v1/problem/list",
 				Handler: ProblemListHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/problem/posts",
+				Handler: ShouOtherPostHandler(serverCtx),
+			},
 		},
 	)
 

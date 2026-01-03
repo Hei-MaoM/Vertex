@@ -3,7 +3,9 @@ package mq
 import (
 	"Vertex/app/user/api/internal/svc"
 	"context"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"time"
 
@@ -64,6 +66,12 @@ func consumeCollectionEvents(svcCtx *svc.ServiceContext) {
 func collectionProcessMessage(svcCtx *svc.ServiceContext, msg *rediss.XMessage) {
 	id, _ := strconv.ParseInt(msg.Values["user_id"].(string), 10, 64)
 	action, _ := msg.Values["action"].(string)
+	catsStr, _ := msg.Values["categories"].(string)
+	if catsStr == "" {
+		return
+	}
+
+	categories := strings.Split(catsStr, ",")
 	var dalta int
 	if action == "add" {
 		dalta = 1
@@ -75,6 +83,11 @@ func collectionProcessMessage(svcCtx *svc.ServiceContext, msg *rediss.XMessage) 
 		if err != nil {
 			logx.Errorf("[STREAM] failed to update user collect_cnt for user %d: %v", id, err)
 		}
+		key := fmt.Sprintf("user:pref:%d", id)
+		for _, cat := range categories {
+			_, _ = svcCtx.Redis.HincrbyFloatCtx(context.Background(), key, cat, float64(dalta))
+		}
+		svcCtx.Redis.ExpireCtx(context.Background(), key, 86400*30)
 	}
 }
 
@@ -184,6 +197,12 @@ func consumeSolveEvents(svcCtx *svc.ServiceContext) {
 func solveProcessMessage(svcCtx *svc.ServiceContext, msg *rediss.XMessage) {
 	id, _ := strconv.ParseInt(msg.Values["user_id"].(string), 10, 64)
 	action, _ := msg.Values["action"].(string)
+	catsStr, _ := msg.Values["categories"].(string)
+	if catsStr == "" {
+		return
+	}
+
+	categories := strings.Split(catsStr, ",")
 	var dalta int
 	if action == "add" {
 		dalta = 1
@@ -195,5 +214,10 @@ func solveProcessMessage(svcCtx *svc.ServiceContext, msg *rediss.XMessage) {
 		if err != nil {
 			logx.Errorf("[STREAM] failed to update user collect_cnt for user %d: %v", id, err)
 		}
+		key := fmt.Sprintf("user:pref:%d", id)
+		for _, cat := range categories {
+			_, _ = svcCtx.Redis.HincrbyFloatCtx(context.Background(), key, cat, float64(dalta)*2)
+		}
+		svcCtx.Redis.ExpireCtx(context.Background(), key, 86400*30)
 	}
 }

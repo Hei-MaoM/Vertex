@@ -1,54 +1,109 @@
-import {useState} from 'react';
-import {UserCard} from './components/UserCard';
-import {ProblemFeed} from './components/ProblemFeed';
-import {AdminAudit} from './components/AdminAudit';
+import {useState, useEffect} from 'react';
+import {BrowserRouter, Routes, Route, useNavigate, useLocation} from 'react-router-dom';
+import {LayoutGrid, Loader2, Plus, Search, ShieldCheck, User as UserIcon} from 'lucide-react';
+
+// === 组件引入 ===
+
 import {LoginModal} from './components/LoginModal';
 import {EditProfileModal} from './components/EditProfileModal';
-import {PublishModal} from './components/PublishModal';
-import {ProblemDetailModal} from './components/ProblemDetailModal';
+// ❌ 已移除 PublishModal import
 import {AuditDetailModal} from './components/AuditDetailModal';
-import {ProfilePage} from './components/ProfilePage'; // ✨ 引入个人主页组件
-import {LayoutGrid, Plus, Search, ShieldCheck, User as UserIcon} from 'lucide-react';
-import type {User} from './types';
-import {LeaderboardCard} from './components/LeaderboardCard';
 
-function App() {
-    // 路由状态：home | admin | profile
-    const [currentPage, setCurrentPage] = useState<'home' | 'admin' | 'profile'>('home');
+// === 页面组件 ===
+import {Home} from './pages/Home';
+import {Admin} from './pages/Admin';
+import {OtherUser} from './pages/OtherUser';
+import {ProblemDetailPage} from './pages/ProblemDetailPage';
+import {PublishPage} from './pages/PublishPage'; // ✨ 新增：独立发布页
+import {ProfilePage} from './components/ProfilePage'; // 我的主页 (复用组件)
 
-    // 模态框状态
+// === API & Types ===
+import {userApi} from './lib/api';
+import type {CommonResp, User} from './types';
+
+const Layout = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // === 全局状态 ===
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [initializing, setInitializing] = useState(true);
+
+    // === 模态框状态 (PublishModal 已移除) ===
     const [showLogin, setShowLogin] = useState(false);
     const [showEditProfile, setShowEditProfile] = useState(false);
-    const [editingUser, setEditingUser] = useState<User | null>(null); // 编辑用的临时对象
-    const [showPublish, setShowPublish] = useState(false);
-    const [selectedProblemId, setSelectedProblemId] = useState<number | null>(null); // 普通详情
-    const [auditId, setAuditId] = useState<number | null>(null); // 审核详情
-
-    // 全局用户状态
-    const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [currentUser, setCurrentUser] = useState<User | null>(null); // ✨ 当前登录用户完整信息
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [auditId, setAuditId] = useState<number | null>(null);
 
     const hasToken = !!localStorage.getItem('jwt_token');
+
     const handleRefresh = () => setRefreshTrigger(p => p + 1);
 
-    // 点击普通列表 -> 打开普通详情
+    // === 核心：应用启动时恢复登录状态 ===
+    useEffect(() => {
+        const initAuth = async () => {
+            const token = localStorage.getItem('jwt_token');
+            if (!token) {
+                setInitializing(false);
+                return;
+            }
+            try {
+                const res = await userApi.post<CommonResp<User>>('/v1/user/myinfo');
+                if (res.data.status === 0 || res.data.status === 200) {
+                    setCurrentUser(res.data.data);
+                } else {
+                    localStorage.removeItem('jwt_token');
+                    setCurrentUser(null);
+                }
+            } catch (err) {
+                console.error("自动登录失败", err);
+                localStorage.removeItem('jwt_token');
+                setCurrentUser(null);
+            } finally {
+                setInitializing(false);
+            }
+        };
+        initAuth();
+    }, [refreshTrigger]);
+
+    // === 交互逻辑 ===
     const handleProblemClick = (id: number) => {
-        if (!hasToken) {
-            setShowLogin(true);
+        navigate(`/problem/${id}`);
+    };
+
+    const handleViewUser = (userId: number) => {
+        if (currentUser && userId === currentUser.id) {
+            navigate('/profile');
         } else {
-            setSelectedProblemId(id);
+            navigate(`/user/${userId}`);
         }
     };
 
-    // 点击审核列表 -> 打开审核详情
     const handleReviewClick = (id: number) => {
         setAuditId(id);
     };
 
+    // === Loading 界面 ===
+    if (initializing) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                    <p className="text-gray-400 text-sm font-medium">Vertex 启动中...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* 🟢 全局模态框区域 */}
-            <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} onLoginSuccess={handleRefresh} />
+            {/* ================= 全局模态框区域 ================= */}
+            <LoginModal
+                isOpen={showLogin}
+                onClose={() => setShowLogin(false)}
+                onLoginSuccess={handleRefresh}
+            />
 
             {editingUser && (
                 <EditProfileModal
@@ -59,48 +114,33 @@ function App() {
                 />
             )}
 
-            <PublishModal isOpen={showPublish} onClose={() => setShowPublish(false)} onSuccess={handleRefresh} />
-
-            <ProblemDetailModal
-                problemId={selectedProblemId}
-                onClose={() => setSelectedProblemId(null)}
-            />
-
+            {/* 审核详情依然保留为弹窗 */}
             <AuditDetailModal
                 problemId={auditId}
                 onClose={() => setAuditId(null)}
                 onSuccess={handleRefresh}
             />
 
-            {/* 🔵 顶部导航栏 */}
+            {/* ================= 顶部导航栏 ================= */}
             <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-8">
-                        <span className="text-2xl font-black text-blue-600 cursor-pointer" onClick={() => setCurrentPage('home')}>Vertex</span>
+                        <span className="text-2xl font-black text-blue-600 cursor-pointer" onClick={() => navigate('/')}>Vertex</span>
+
                         <div className="hidden md:flex gap-6 text-gray-600 font-medium">
-                            <button
-                                onClick={() => setCurrentPage('home')}
-                                className={`flex items-center gap-1 ${currentPage === 'home' ? 'text-blue-600' : 'hover:text-blue-600'}`}
-                            >
+                            <button onClick={() => navigate('/')} className={`flex items-center gap-1 ${location.pathname === '/' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
                                 <LayoutGrid size={18} /> 题库
                             </button>
 
-                            {/* 个人中心按钮 (可选) */}
                             {hasToken && (
-                                <button
-                                    onClick={() => setCurrentPage('profile')}
-                                    className={`flex items-center gap-1 ${currentPage === 'profile' ? 'text-blue-600' : 'hover:text-blue-600'}`}
-                                >
+                                <button onClick={() => navigate('/profile')} className={`flex items-center gap-1 ${location.pathname === '/profile' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
                                     <UserIcon size={18}/> 我的
                                 </button>
                             )}
 
-                            {/* 管理后台按钮 */}
+                            {/* 只有管理员可见 */}
                             {currentUser && currentUser.authority >= 2 && (
-                                <button
-                                    onClick={() => setCurrentPage('admin')}
-                                    className={`flex items-center gap-1 ${currentPage === 'admin' ? 'text-blue-600' : 'hover:text-blue-600'}`}
-                                >
+                                <button onClick={() => navigate('/admin')} className={`flex items-center gap-1 ${location.pathname === '/admin' ? 'text-blue-600' : 'hover:text-blue-600'}`}>
                                     <ShieldCheck size={18} /> 管理后台
                                 </button>
                             )}
@@ -109,7 +149,11 @@ function App() {
 
                     <div className="flex items-center gap-4">
                         {hasToken && (
-                            <button onClick={() => setShowPublish(true)} className="flex items-center gap-1 bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-blue-700 transition">
+                            // ✨✨✨ 修改：点击发布跳转页面 ✨✨✨
+                            <button
+                                onClick={() => navigate('/publish')}
+                                className="flex items-center gap-1 bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-blue-700 transition"
+                            >
                                 <Plus size={16} /> 发布
                             </button>
                         )}
@@ -117,75 +161,83 @@ function App() {
                             <input type="text" placeholder="搜索..." className="pl-9 pr-4 py-1.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 w-64" />
                             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2" />
                         </div>
+                        {!hasToken && (
+                            <button onClick={() => setShowLogin(true)} className="text-sm font-bold text-gray-600 hover:text-blue-600">
+                                登录
+                            </button>
+                        )}
                     </div>
                 </div>
             </nav>
 
-            {/* 🟠 主体内容区域 */}
+            {/* ================= 路由内容区域 ================= */}
             <main className="max-w-6xl mx-auto px-4 py-6">
+                <Routes>
+                    {/* 1. 首页 */}
+                    <Route path="/" element={
+                        <Home
+                            refreshTrigger={refreshTrigger}
+                            setShowLogin={setShowLogin}
+                            setEditingUser={setEditingUser}
+                            setShowEditProfile={setShowEditProfile}
+                            setCurrentUser={setCurrentUser}
+                            onItemClick={handleProblemClick}
+                            onUserClick={handleViewUser}
+                        />
+                    } />
 
-                {/* ============ 场景 1: 首页 ============ */}
-                {currentPage === 'home' && (
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                        <aside className="hidden md:block md:col-span-3">
-                            <UserCard
-                                onShowLogin={() => setShowLogin(true)}
-                                refreshTrigger={refreshTrigger}
-                                onEditProfile={(u) => { setEditingUser(u); setShowEditProfile(true); }}
-                                // ✨ 接收完整用户对象，更新 App 状态
-                                onUserLoaded={(user) => setCurrentUser(user)}
-                                // ✨ 切换到个人主页
-                                onGoProfile={() => setCurrentPage('profile')}
-                            />
-                        </aside>
-                        <section className="col-span-1 md:col-span-6">
-                            <ProblemFeed onItemClick={handleProblemClick} />
-                        </section>
-                        <aside className="hidden md:block md:col-span-3 space-y-6">
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                <h3 className="font-bold text-gray-800 mb-2">📢 社区公告</h3>
-                                <p className="text-sm text-gray-500">Vertex V1.0 正式公测！欢迎发布原创算法题解。</p>
-                            </div>
-                            <LeaderboardCard/>
-                        </aside>
-                    </div>
-                )}
+                    {/* 2. 题目详情页 */}
+                    <Route path="/problem/:id" element={
+                        <ProblemDetailPage />
+                    } />
 
-                {/* ============ 场景 2: 个人主页 ============ */}
-                {currentPage === 'profile' && (
-                    <div className="max-w-4xl mx-auto">
-                        {currentUser ? (
-                            <ProfilePage
-                                user={currentUser}
-                                onBack={() => setCurrentPage('home')}
-                                // ✨ 传入点击回调，复用 handleProblemClick
-                                onItemClick={handleProblemClick}
-                            />
+                    {/* 3. 发布页 (✨ 新增路由) */}
+                    <Route path="/publish" element={
+                        currentUser ? <PublishPage /> : <div className="p-20 text-center text-gray-400">请先登录后发布</div>
+                    } />
+
+                    {/* 4. 我的主页 */}
+                    <Route path="/profile" element={
+                        <div className="max-w-4xl mx-auto">
+                            {currentUser ? (
+                                <ProfilePage
+                                    user={currentUser}
+                                    onBack={() => navigate('/')}
+                                    onItemClick={handleProblemClick}
+                                />
+                            ) : (
+                                <div className="text-center py-20 text-gray-400 flex flex-col gap-4">
+                                    <p>请先登录查看个人主页</p>
+                                    <button onClick={() => setShowLogin(true)} className="text-blue-600 font-bold hover:underline">点击登录</button>
+                                </div>
+                            )}
+                        </div>
+                    } />
+
+                    {/* 5. 他人主页 */}
+                    <Route path="/user/:id" element={
+                        <OtherUser onItemClick={handleProblemClick} />
+                    } />
+
+                    {/* 6. 管理后台 */}
+                    <Route path="/admin" element={
+                        currentUser && currentUser.authority >= 2 ? (
+                            <Admin currentUser={currentUser} onReview={handleReviewClick} />
                         ) : (
-                            <div className="text-center py-20 text-gray-400">正在加载用户信息...</div>
-                        )}
-                    </div>
-                )}
-
-                {/* ============ 场景 3: 管理后台 ============ */}
-                {currentPage === 'admin' && (
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                        <aside className="hidden md:block md:col-span-3">
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 sticky top-24">
-                                <div className="text-xs font-bold text-gray-400 uppercase mb-4 px-2">Admin Menu</div>
-                                <ul className="space-y-1">
-                                    <li><button className="w-full text-left px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium text-sm">题目审核</button></li>
-                                </ul>
-                            </div>
-                        </aside>
-                        <section className="col-span-1 md:col-span-9">
-                            <AdminAudit onReview={handleReviewClick}/>
-                        </section>
-                    </div>
-                )}
-
+                            <div className="text-center py-20 text-red-400 font-bold">403 - 权限不足</div>
+                        )
+                    } />
+                </Routes>
             </main>
         </div>
+    );
+};
+
+function App() {
+    return (
+        <BrowserRouter>
+            <Layout />
+        </BrowserRouter>
     );
 }
 

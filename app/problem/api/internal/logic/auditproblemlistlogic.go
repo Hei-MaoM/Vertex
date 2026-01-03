@@ -53,7 +53,7 @@ func (l *AuditProblemListLogic) AuditProblemList(req *types.ListReq) (resp *type
 		dataList = append(dataList, types.ProblemPost{
 			Id:     int64(p.Id),
 			Title:  p.Title,
-			Tags:   problem.TagsStr,
+			Tags:   p.TagsStr,
 			Source: problem.Source,
 		})
 	}

@@ -27,6 +27,12 @@ type GetMyPostsReq struct {
 	Status   int64 `form:"status,default=-1"` // -1:全部, 0:待审, 1:已发, 2:撤销
 }
 
+type GetPostsReq struct {
+	Page     int64 `form:"page,default=1"`
+	PageSize int64 `form:"page_size,default=20"`
+	Id       int64 `form:"id"`
+}
+
 type GetProblemDetailReq struct {
 	Id int64 `form:"id"`
 }
@@ -67,11 +73,14 @@ type ProblemDetail struct {
 	Source     string `json:"source"`
 	IsSolved   bool   `json:"is_solved"`   // 当前用户是否已打卡该题
 	ProblemUrl string `json:"problem_url"` // 原题链接 (需要关联查 problem 表)
+	AuthorId   int64  `json:"author_id"`
 	ViewNum    int64  `json:"view_num"`
+	Tags       string `json:"tags"`
 }
 
 type ProblemIdReq struct {
-	Id int64 `json:"id"`
+	Id     int64 `json:"id"`
+	PostId int64 `json:"pid"`
 }
 
 type ProblemPost struct {

@@ -1,64 +1,56 @@
 import {useEffect, useState} from 'react';
 import {userApi} from '../lib/api';
-import type {CommonResp} from '../types';
+import type {CommonResp, User} from '../types';
 
-interface UserInfo {
-    id: number;
-    username: string;
-    avatar: string;
+interface Props {
+    userId: number;
+    onClick?: (id: number) => void; // ✨ 接收点击回调
 }
 
-// 简单的内存缓存
-const userCache: Record<number, UserInfo> = {};
-
-export const AuthorBadge = ({userId}: { userId: number }) => {
-    const [author, setAuthor] = useState<UserInfo | null>(null);
+export const AuthorBadge = ({ userId, onClick }: Props) => {
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         if (!userId) return;
-
-        // 1. 先查缓存
-        if (userCache[userId]) {
-            setAuthor(userCache[userId]);
-            return;
-        }
-
-        // 2. 没缓存，调接口 GET /v1/user/showinfo?id=...
-        const fetchUser = async () => {
-            try {
-                // 注意：你的 user.api 定义的是 GET /v1/user/showinfo (UserInfoReq)
-                // GET 请求参数要放 params 里，或者拼在 URL
-                const res = await userApi.get<CommonResp<UserInfo>>('/v1/user/showinfo', {
-                    params: {id: userId}
-                });
-
+        // 简单请求用户信息 (实际项目中可以使用 react-query 缓存)
+        userApi.get<CommonResp<User>>('/v1/user/showinfo', {
+            params: { id: userId }
+        })
+            .then(res => {
                 if (res.data.status === 0 || res.data.status === 200) {
-                    const userData = res.data.data;
-                    setAuthor(userData);
-                    userCache[userId] = userData; // 写入缓存
+                    setUser(res.data.data);
                 }
-            } catch (err) {
-                console.error(`加载用户 ${userId} 失败`, err);
-            }
-        };
-
-        fetchUser();
+            })
+            .catch(() => {});
     }, [userId]);
 
-    if (!author) {
-        return <span className="text-xs text-gray-300">加载中...</span>;
+    if (!user) {
+        return <span className="text-gray-300 text-xs animate-pulse">加载中...</span>;
     }
 
     return (
-        <div className="flex items-center gap-2 group cursor-pointer">
+        <div
+            className="flex items-center gap-2 group cursor-pointer hover:bg-gray-100 pr-2 py-0.5 rounded-full transition relative z-10"
+            onClick={(e) => {
+                // ✨ 阻止事件冒泡，防止触发父级（如 ProblemFeed）的点击事件
+                e.stopPropagation();
+                if (onClick) onClick(userId);
+            }}
+            title="点击查看主页"
+        >
             <img
-                src={author.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.username}`}
-                alt={author.username}
-                className="w-5 h-5 rounded-full border border-gray-200 group-hover:border-blue-300 transition"
+                src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
+                alt={user.username}
+                className="w-5 h-5 rounded-full bg-white border border-gray-200 object-cover"
             />
-            <span className="text-xs text-gray-500 group-hover:text-blue-600 transition">
-                {author.username}
+            <span className="text-xs text-gray-500 font-medium group-hover:text-blue-600 transition-colors">
+                {user.username}
             </span>
+            {user.authority >= 2 && (
+                <span className="text-[10px] bg-blue-50 text-blue-600 px-1 rounded font-bold scale-90 origin-left">
+                    Lv.{user.authority}
+                </span>
+            )}
         </div>
     );
 };

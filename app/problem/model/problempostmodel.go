@@ -23,6 +23,8 @@ type (
 		UpdateViewNum(ctx context.Context, id, viewNum int64) error
 		FindPosts(ctx context.Context, userId, status, page, pageSize int64) ([]*ProblemPost, int64, error)
 		UpdateCollectCount(ctx context.Context, uid uint64, delta int) error
+		FindPostsByProblemId(ctx context.Context, problemId int64) ([]*int64, error)
+		UpdateScore(ctx context.Context, id uint64, score float64) error
 	}
 
 	customProblemPostModel struct {
@@ -102,6 +104,23 @@ func (m *customProblemPostModel) UpdateCollectCount(ctx context.Context, id uint
 	query := fmt.Sprintf("UPDATE problem_post SET collect_num = collect_num + ? WHERE id = ?")
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (sql.Result, error) {
 		return conn.ExecCtx(ctx, query, delta, id)
+	})
+	return err
+}
+func (m *customProblemPostModel) FindPostsByProblemId(ctx context.Context, problemId int64) ([]*int64, error) {
+	where := "problem_id = ? AND status=1"
+
+	postId := make([]*int64, 0)
+	countQuery := fmt.Sprintf("SELECT id FROM %s WHERE %s", m.table, where)
+	err := m.CachedConn.QueryRowsNoCacheCtx(ctx, &postId, countQuery, problemId) // 注意: 用 NoCache 或者处理好缓存
+
+	return postId, err
+}
+
+func (m *customProblemPostModel) UpdateScore(ctx context.Context, id uint64, score float64) error {
+	query := fmt.Sprintf("UPDATE problem_post SET score = ? WHERE id = ?")
+	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (sql.Result, error) {
+		return conn.ExecCtx(ctx, query, score, id)
 	})
 	return err
 }

@@ -48,6 +48,7 @@ type (
 		Content    string       `db:"content"`    // 推荐理由/内容
 		Solution   string       `db:"solution"`   // 代码/题解
 		Status     uint64       `db:"status"`     // 状态: 0-审核中, 1-以发布, 2-已撤销
+		TagsStr    string       `db:"tags_str"`   // Tag名称快照
 		ViewNum    uint64       `db:"view_num"`
 		CollectNum uint64       `db:"collect_num"`
 		CreatedAt  time.Time    `db:"created_at"`
@@ -92,8 +93,8 @@ func (m *defaultProblemPostModel) FindOne(ctx context.Context, id uint64) (*Prob
 func (m *defaultProblemPostModel) Insert(ctx context.Context, data *ProblemPost) (sql.Result, error) {
 	problemPostIdKey := fmt.Sprintf("%s%v", cacheProblemPostIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, problemPostRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.ProblemId, data.UserId, data.Title, data.Content, data.Solution, data.Status, data.ViewNum, data.CollectNum, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, problemPostRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.ProblemId, data.UserId, data.Title, data.Content, data.Solution, data.Status, data.TagsStr, data.ViewNum, data.CollectNum, data.DeletedAt)
 	}, problemPostIdKey)
 	return ret, err
 }
@@ -102,7 +103,7 @@ func (m *defaultProblemPostModel) Update(ctx context.Context, data *ProblemPost)
 	problemPostIdKey := fmt.Sprintf("%s%v", cacheProblemPostIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, problemPostRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.ProblemId, data.UserId, data.Title, data.Content, data.Solution, data.Status, data.ViewNum, data.CollectNum, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.ProblemId, data.UserId, data.Title, data.Content, data.Solution, data.Status, data.TagsStr, data.ViewNum, data.CollectNum, data.DeletedAt, data.Id)
 	}, problemPostIdKey)
 	return err
 }

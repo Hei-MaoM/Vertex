@@ -2,13 +2,14 @@ import {useEffect, useState} from 'react';
 import type {ProblemPost} from '../types';
 import {problemApi} from '../lib/api';
 import {CheckCircle2, Loader2, Tag as TagIcon} from 'lucide-react';
-import {AuthorBadge} from './AuthorBadge'; // 确保你已经创建了这个组件
+import {AuthorBadge} from './AuthorBadge';
 
 interface Props {
     onItemClick: (id: number) => void;
+    onUserClick?: (id: number) => void; // ✨ 新增：接收用户点击回调
 }
 
-export const ProblemFeed = ({ onItemClick }: Props) => {
+export const ProblemFeed = ({ onItemClick, onUserClick }: Props) => {
     const [problems, setProblems] = useState<ProblemPost[]>([]);
     const [loading, setLoading] = useState(true);
     const [debugMsg, setDebugMsg] = useState("");
@@ -16,12 +17,10 @@ export const ProblemFeed = ({ onItemClick }: Props) => {
     useEffect(() => {
         const fetchProblems = async () => {
             try {
-                // 使用 any 绕过类型检查，直接读取真实结构
                 const res = await problemApi.get<any>('/v1/problem/list', {
                     params: { page: 1, page_size: 20 }
                 });
 
-                // 兼容 status 200 和 0
                 if (res.data.status === 200 || res.data.status === 0) {
                     const list = res.data.data || [];
                     setProblems(list);
@@ -55,29 +54,33 @@ export const ProblemFeed = ({ onItemClick }: Props) => {
                 <div
                     key={item.id}
                     onClick={() => onItemClick(item.id)}
-                    className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer group"
+                    className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer group relative"
                 >
                     <div className="flex justify-between items-start">
                         <div className="flex-1">
+                            {/* Header: 来源 + 标题 + 状态 */}
                             <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-semibold text-blue-500 bg-blue-50 px-2 py-0.5 rounded">
-                  {item.source || "原创"}
-                </span>
-                                <h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition">
+                                <span className="text-xs font-semibold text-blue-500 bg-blue-50 px-2 py-0.5 rounded">
+                                  {item.source || "原创"}
+                                </span>
+                                <h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition line-clamp-1">
                                     {item.title}
                                 </h3>
-                                {item.is_solved && <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-50" />}
+                                {item.is_solved && <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-50 flex-shrink-0" />}
                             </div>
 
-                            {/* ✨ 作者信息 (解耦组件) */}
+                            {/* ✨ Author Info (点击事件在这里处理) */}
                             {item.authorid > 0 && (
-                                <div className="flex items-center gap-2 mb-3 mt-1" onClick={(e) => e.stopPropagation()}>
-                                    <AuthorBadge userId={item.authorid}/>
+                                <div className="mb-3 mt-1">
+                                    <AuthorBadge
+                                        userId={item.authorid}
+                                        onClick={onUserClick} // ✨ 传递回调
+                                    />
                                 </div>
                             )}
 
-                            {/* ✨ Tags (字符串分割) */}
-                            <div className="flex flex-wrap gap-2 mb-4">
+                            {/* Tags */}
+                            <div className="flex flex-wrap gap-2">
                                 {item.tags && item.tags.length > 0 ? (
                                     item.tags.split(',').map((tagName, index) => (
                                         <div

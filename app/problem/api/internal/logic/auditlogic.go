@@ -6,6 +6,7 @@ package logic
 import (
 	"Vertex/pkg/errno"
 	"context"
+	"strings"
 
 	"Vertex/app/problem/api/internal/svc"
 	"Vertex/app/problem/api/internal/types"
@@ -80,6 +81,28 @@ func (l *AuditLogic) Audit(req *types.AuditReq) (resp *types.CommonResp, err err
 			"action":  "add",
 		}
 		_, err = l.svcCtx.Redis.XAddCtx(l.ctx, streamKey, false, "*", message)
+		tagSet := make(map[string]bool)
+		tags := strings.Split(problem.TagsStr, ",")
+		for _, tag := range tags {
+			cleanTag := strings.TrimSpace(tag)
+			if cleanTag == "" {
+				tagSet[cleanTag] = true
+			}
+		}
+		tags = strings.Split(problemPost.TagsStr, ",")
+		for _, tag := range tags {
+			cleanTag := strings.TrimSpace(tag)
+			if cleanTag == "" {
+				tagSet[cleanTag] = true
+			}
+		}
+		var allTags []string
+		for t := range tagSet {
+			allTags = append(allTags, t)
+		}
+		mergedTagsStr := strings.Join(allTags, ",")
+		problem.TagsStr = mergedTagsStr
+		l.svcCtx.ProblemPostModel.Update(l.ctx, problem)
 	}
 	return &types.CommonResp{
 		Status: int32(code),

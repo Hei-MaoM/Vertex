@@ -54,7 +54,7 @@ func (l *ProblemListLogic) ProblemList(req *types.ListReq) (resp *types.ListResp
 		dataList = append(dataList, types.ProblemPost{
 			Id:       int64(p.Id),
 			Title:    p.Title,
-			Tags:     problem.TagsStr,
+			Tags:     p.TagsStr,
 			AuthorId: int64(p.UserId),
 			Source:   problem.Source,
 		})

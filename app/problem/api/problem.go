@@ -4,6 +4,8 @@
 package main
 
 import (
+	"Vertex/app/problem/api/internal/cron"
+	"context"
 	"flag"
 	"fmt"
 
@@ -11,6 +13,7 @@ import (
 	"Vertex/app/problem/api/internal/handler"
 	"Vertex/app/problem/api/internal/svc"
 
+	gitcron "github.com/robfig/cron/v3"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -28,7 +31,13 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
-
+	cJob := gitcron.New()
+	job := cron.NewHotJob(context.Background(), ctx)
+	_, err := cJob.AddFunc("0 * * * *", job.Run)
+	if err != nil {
+		panic(err)
+	}
+	cJob.Start()
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
 }

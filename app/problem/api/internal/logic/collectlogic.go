@@ -10,6 +10,8 @@ import (
 	"Vertex/pkg/errno"
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -71,13 +73,33 @@ func (l *CollectLogic) Collect(req *types.CollectReq) (resp *types.CommonResp, e
 	}
 	streamKey := "stream:collection"
 	problem, _ := l.svcCtx.ProblemPostModel.FindOne(l.ctx, uint64(req.Id))
+	m := make(map[string]struct{}, 0)
+	tags := make([]string, 0)
+	if err != nil {
+		logx.Error(err.Error())
+		return &types.CommonResp{
+			Status: 500,
+			Msg:    "错误",
+			Error:  err.Error(),
+		}, nil
+	}
+	tag := strings.Split(problem.TagsStr, ",")
+	for _, res := range tag {
+		ttag, _ := l.svcCtx.TagModel.FindOneByName(l.ctx, res)
+		if _, ok := m[ttag.Category]; !ok {
+			m[ttag.Category] = struct{}{}
+			tags = append(tags, ttag.Category)
+		}
 
+	}
 	message := map[string]interface{}{
 		"user_id": problem.UserId,
 		"action":  req.Action, // "add" or "remove"
-
+		"tag":     tags,
 	}
 	_, err = l.svcCtx.Redis.XAddCtx(l.ctx, streamKey, false, "*", message)
+	key := fmt.Sprintf("problem:score:%d", req.Id)
+	l.svcCtx.Redis.HincrbyFloatCtx(l.ctx, key, "collect", 10.0)
 	return &types.CommonResp{
 		Status: 200,
 		Msg:    "ok",

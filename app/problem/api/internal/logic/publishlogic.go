@@ -34,24 +34,22 @@ func NewPublishLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PublishLo
 func (l *PublishLogic) Publish(req *types.PublishReq) (resp *types.CommonResp, err error) {
 	problemUrl := req.ProblemUrl
 	problem, err := l.svcCtx.ProblemModel.FindOneByUrl(l.ctx, problemUrl)
-
-	if errors.Is(err, sqlx.ErrNotFound) {
-		var tag string
-		for i := 0; i < len(req.TagIds); i += 1 {
-			tag1, _ := l.svcCtx.TagModel.FindOne(l.ctx, uint64(req.TagIds[i]))
-			if i != 0 {
-				tag = fmt.Sprintf("%s,%s", tag, tag1.Name)
-			} else {
-				tag = tag1.Name
-			}
+	var tag string
+	for i := 0; i < len(req.TagIds); i += 1 {
+		tag1, _ := l.svcCtx.TagModel.FindOne(l.ctx, uint64(req.TagIds[i]))
+		if i != 0 {
+			tag = fmt.Sprintf("%s,%s", tag, tag1.Name)
+		} else {
+			tag = tag1.Name
 		}
+	}
+	if errors.Is(err, sqlx.ErrNotFound) {
 
 		problem = &model.Problem{
 			Title:      req.ProblemTitle,
 			Source:     req.ProblemSource,
 			Url:        req.ProblemUrl,
-			TagsStr:    tag,
-			ViewNum:    0,
+			SolveNum:   0,
 			CollectNum: 0,
 		}
 		_, _ = l.svcCtx.ProblemModel.Insert(l.ctx, problem)
@@ -80,6 +78,7 @@ func (l *PublishLogic) Publish(req *types.PublishReq) (resp *types.CommonResp, e
 		Status:     0,
 		ViewNum:    0,
 		CollectNum: 0,
+		TagsStr:    tag,
 	}
 	_, _ = l.svcCtx.ProblemPostModel.Insert(l.ctx, problemPost)
 	return &types.CommonResp{

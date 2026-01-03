@@ -1,15 +1,13 @@
-// src/components/AdminAudit.tsx
-
 import {useEffect, useState} from 'react';
 import type {ProblemPost} from '../types';
 import {problemApi} from '../lib/api';
-import {AlertCircle, Eye, Loader2} from 'lucide-react'; // 删掉了 Check, X
+import {AlertCircle, Eye, Loader2} from 'lucide-react';
 
 interface Props {
-    onReview: (id: number) => void; // ✨ 新增：点击审核的回调
+    onReview: (id: number) => void;
 }
 
-export const AdminAudit = ({onReview}: Props) => {
+export const AdminProblemAudit = ({onReview}: Props) => {
     const [auditList, setAuditList] = useState<ProblemPost[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -35,20 +33,18 @@ export const AdminAudit = ({onReview}: Props) => {
         fetchAuditList();
     }, []);
 
-    if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500"/>
-    </div>;
+    if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500"/></div>;
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-in fade-in duration-300">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                 <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                     <AlertCircle className="text-orange-500"/> 待审核队列
-                    <span
-                        className="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-full">{auditList.length}</span>
+                    <span className="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-full">{auditList.length}</span>
                 </h2>
                 <button onClick={fetchAuditList} className="text-sm text-blue-600 hover:underline">刷新列表</button>
             </div>
-
+            {/* 表格代码保持不变 */}
             <div className="overflow-x-auto">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50 text-gray-500 text-sm">
@@ -69,15 +65,9 @@ export const AdminAudit = ({onReview}: Props) => {
                             <tr key={item.id} className="hover:bg-gray-50 transition">
                                 <td className="px-6 py-4 text-gray-500">#{item.id}</td>
                                 <td className="px-6 py-4 font-medium text-gray-800">{item.title}</td>
-                                <td className="px-6 py-4"><span
-                                    className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">{item.source}</span>
-                                </td>
+                                <td className="px-6 py-4"><span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">{item.source}</span></td>
                                 <td className="px-6 py-4 text-right">
-                                    {/* ✨ 只有查看按钮 */}
-                                    <button
-                                        onClick={() => onReview(item.id)}
-                                        className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1 justify-end ml-auto"
-                                    >
+                                    <button onClick={() => onReview(item.id)} className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1 justify-end ml-auto">
                                         <Eye size={16}/> 审核
                                     </button>
                                 </td>

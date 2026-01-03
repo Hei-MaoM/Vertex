@@ -81,6 +81,20 @@ export const AuditDetailModal = ({problemId, onClose, onSuccess}: Props) => {
                                     href={detail.problem_url} target="_blank"
                                     className="text-blue-500 underline">{detail.problem_url}</a></div>
                             </div>
+                            {detail.tags && (
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {detail.tags.split(',').map((tag) => (
+                                        <span
+                                            key={tag}
+                                            className="px-3 py-1 text-xs font-bold rounded-full
+                           bg-gray-100 text-gray-600
+                           hover:bg-blue-100 hover:text-blue-700 transition"
+                                        >
+                #{tag}
+            </span>
+                                    ))}
+                                </div>
+                            )}
                             <div className="bg-white p-6 rounded-xl shadow-sm">
                                 <h3 className="font-bold mb-4 border-l-4 border-blue-500 pl-3">内容</h3>
                                 <div className="whitespace-pre-wrap text-gray-700">{detail.content}</div>

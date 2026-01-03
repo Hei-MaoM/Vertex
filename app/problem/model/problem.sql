@@ -11,9 +11,9 @@ CREATE TABLE `problem`
     `tags_str`    varchar(512)  NOT NULL DEFAULT '' COMMENT 'Tag名称快照',
 
     -- 热度数据
-    `view_num`    int unsigned NOT NULL DEFAULT '0',
+    `solve_num`    int unsigned NOT NULL DEFAULT '0',
     `collect_num` int unsigned NOT NULL DEFAULT '0',
-
+    `score` decimal(20,4) NOT NULL DEFAULT '0.0000' COMMENT '综合热度分',
     `created_at`  timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`  timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at`  timestamp NULL DEFAULT NULL,
@@ -31,6 +31,7 @@ CREATE TABLE `problem_post`
     `content`     text         NOT NULL COMMENT '推荐理由/内容',
     `solution`    text         NOT NULL COMMENT '代码/题解',
     `status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '状态: 0-审核中, 1-以发布, 2-已撤销',
+    `tags_str`    varchar(512)  NOT NULL DEFAULT '' COMMENT 'Tag名称快照',
     -- 热度数据
     `view_num`    int unsigned NOT NULL DEFAULT '0',
     `collect_num` int unsigned NOT NULL DEFAULT '0',

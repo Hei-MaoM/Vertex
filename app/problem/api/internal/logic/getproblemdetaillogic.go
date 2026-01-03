@@ -56,6 +56,8 @@ func (l *GetProblemDetailLogic) GetProblemDetail(req *types.GetProblemDetailReq)
 	}
 	viewCountKey := fmt.Sprintf("vertex:post:views:%d", req.Id)
 	newView, _ := l.svcCtx.Redis.Incr(viewCountKey)
+	key := fmt.Sprintf("problem:score:%d", req.Id)
+	l.svcCtx.Redis.HincrbyFloatCtx(l.ctx, key, "view", 0.1)
 	if newView == 1 && p.ViewNum > uint64(newView) {
 		newView = int64(p.ViewNum + 1)
 		err := l.svcCtx.Redis.Set(viewCountKey, strconv.FormatInt(newView, 10))
@@ -85,6 +87,8 @@ func (l *GetProblemDetailLogic) GetProblemDetail(req *types.GetProblemDetailReq)
 			IsSolved:   isSolved,
 			ProblemUrl: problemUrl,
 			ViewNum:    newView,
+			Tags:       p.TagsStr,
+			AuthorId:   int64(p.UserId),
 		},
 	}, nil
 }

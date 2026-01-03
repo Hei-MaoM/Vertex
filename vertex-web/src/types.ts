@@ -55,7 +55,8 @@ export interface ProblemDetail {
     is_solved: boolean;
     problem_url: string;
     view_num: number;
-    // tags: string; // 如果后端详情接口没返回 tags，这里就先不写，或者复用列表的 tags
+    author_id: number;
+    tags: string; // 如果后端详情接口没返回 tags，这里就先不写，或者复用列表的 tags
 }
 
 // 列表响应
