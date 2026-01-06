@@ -67,6 +67,9 @@ func (l *PublishLogic) Publish(req *types.PublishReq) (resp *types.CommonResp, e
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("密钥错误"))
 	}
+	content := fmt.Sprintf("%s\n%s\n%s\n%s\n", req.Title, req.Content, req.ProblemTitle, req.TagIds)
+	vec, _ := l.svcCtx.ZhipuClient.GetEmbedding(content)
+	vecJson, _ := json.Marshal(vec)
 	userid, _ := usernum.Int64()
 	var problemPost *model.ProblemPost
 	problemPost = &model.ProblemPost{
@@ -79,6 +82,7 @@ func (l *PublishLogic) Publish(req *types.PublishReq) (resp *types.CommonResp, e
 		ViewNum:    0,
 		CollectNum: 0,
 		TagsStr:    tag,
+		Embedding:  string(vecJson),
 	}
 	_, _ = l.svcCtx.ProblemPostModel.Insert(l.ctx, problemPost)
 	return &types.CommonResp{

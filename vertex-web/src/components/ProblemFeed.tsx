@@ -1,12 +1,12 @@
 import {useEffect, useState} from 'react';
 import type {ProblemPost} from '../types';
 import {problemApi} from '../lib/api';
-import {CheckCircle2, Loader2, Tag as TagIcon} from 'lucide-react';
+import {CheckCircle2, Loader2, Tag as TagIcon, Sparkles} from 'lucide-react'; // ✨ 引入 Sparkles 图标
 import {AuthorBadge} from './AuthorBadge';
 
 interface Props {
     onItemClick: (id: number) => void;
-    onUserClick?: (id: number) => void; // ✨ 新增：接收用户点击回调
+    onUserClick?: (id: number) => void;
 }
 
 export const ProblemFeed = ({onItemClick, onUserClick}: Props) => {
@@ -14,11 +14,27 @@ export const ProblemFeed = ({onItemClick, onUserClick}: Props) => {
     const [loading, setLoading] = useState(true);
     const [debugMsg, setDebugMsg] = useState("");
 
+    // ✨ 状态：当前是否是推荐模式
+    const [isRecommend, setIsRecommend] = useState(false);
+
     useEffect(() => {
         const fetchProblems = async () => {
             try {
-                const res = await problemApi.get<any>('/v1/problem/list', {
-                    params: { page: 1, page_size: 20 }
+                // ✨✨✨ 判断登录状态 ✨✨✨
+                const hasToken = !!localStorage.getItem('jwt_token');
+
+                // 决定 API 路径
+                const endpoint = hasToken ? '/v1/problem/recommend' : '/v1/problem/list';
+
+                setIsRecommend(hasToken);
+
+                const res = await problemApi.get<any>(endpoint, {
+                    params: {
+                        page: 1,
+                        // 推荐接口通常叫 count，列表叫 page_size，为了兼容可以都传
+                        page_size: 20,
+                        count: 20
+                    }
                 });
 
                 if (res.data.status === 200 || res.data.status === 0) {
@@ -50,6 +66,14 @@ export const ProblemFeed = ({onItemClick, onUserClick}: Props) => {
 
     return (
         <div className="space-y-4">
+            {/* ✨✨✨ 推荐模式下的标题提示 (可选) ✨✨✨ */}
+            {isRecommend && (
+                <div className="flex items-center gap-2 px-2 pb-2 text-sm font-bold text-gray-500">
+                    <Sparkles size={16} className="text-yellow-500" />
+                    为你推荐
+                </div>
+            )}
+
             {problems.map((item) => (
                 <div
                     key={item.id}
@@ -58,7 +82,7 @@ export const ProblemFeed = ({onItemClick, onUserClick}: Props) => {
                 >
                     <div className="flex justify-between items-start">
                         <div className="flex-1">
-                            {/* Header: 来源 + 标题 + 状态 */}
+                            {/* Header */}
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="text-xs font-semibold text-blue-500 bg-blue-50 px-2 py-0.5 rounded">
                                   {item.source || "原创"}
@@ -66,16 +90,15 @@ export const ProblemFeed = ({onItemClick, onUserClick}: Props) => {
                                 <h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition line-clamp-1">
                                     {item.title}
                                 </h3>
-                                {item.is_solved &&
-                                    <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-50 flex-shrink-0"/>}
+                                {item.is_solved && <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-50 flex-shrink-0"/>}
                             </div>
 
-                            {/* ✨ Author Info (点击事件在这里处理) */}
+                            {/* Author Info */}
                             {item.authorid > 0 && (
                                 <div className="mb-3 mt-1">
                                     <AuthorBadge
                                         userId={item.authorid}
-                                        onClick={onUserClick} // ✨ 传递回调
+                                        onClick={onUserClick}
                                     />
                                 </div>
                             )}

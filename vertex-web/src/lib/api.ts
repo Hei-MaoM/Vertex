@@ -5,13 +5,13 @@ const getToken = () => localStorage.getItem('jwt_token');
 
 // 1. 用户服务 API (8081)
 export const userApi = axios.create({
-    baseURL: 'http://localhost:8081',
+    baseURL: '/v1/user',
     timeout: 5000,
 });
 
 // 2. 题目服务 API (8082)
 export const problemApi = axios.create({
-    baseURL: 'http://localhost:8082',
+    baseURL: '/v1/problem',
     timeout: 5000,
 });
 
@@ -30,10 +30,8 @@ problemApi.interceptors.request.use(authInterceptor);
 
 // 响应拦截器：处理 401 未登录
 const errorInterceptor = (error: any) => {
-    if (error.response && error.response.status === 401) {
+    if (error.response?.status === 401) {
         localStorage.removeItem('jwt_token');
-        // 如果是 401，刷新页面让用户重新登录
-        window.location.reload();
     }
     return Promise.reject(error);
 };

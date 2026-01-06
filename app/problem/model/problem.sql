@@ -6,14 +6,9 @@ CREATE TABLE `problem`
     `source`      varchar(50)   NOT NULL DEFAULT '' COMMENT '来源: LeetCode/Luogu等',
     `url`         varchar(700)  NOT NULL DEFAULT '' COMMENT '核心跳转链接',
     `description` varchar(1024) NOT NULL DEFAULT '' COMMENT '简短描述(可选)',
-
-    -- 冗余字段：为了列表页不查关联表，直接显示 Tag 名字 (如 "DP,Array")
     `tags_str`    varchar(512)  NOT NULL DEFAULT '' COMMENT 'Tag名称快照',
-
-    -- 热度数据
     `solve_num` int unsigned NOT NULL DEFAULT '0',
     `collect_num` int unsigned NOT NULL DEFAULT '0',
-    `score`     decimal(20, 4) NOT NULL DEFAULT '0.0000' COMMENT '综合热度分',
     `created_at`  timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`  timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at`  timestamp NULL DEFAULT NULL,
@@ -32,13 +27,13 @@ CREATE TABLE `problem_post`
     `solution`    text         NOT NULL COMMENT '代码/题解',
     `status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '状态: 0-审核中, 1-以发布, 2-已撤销',
     `tags_str` varchar(512) NOT NULL DEFAULT '' COMMENT 'Tag名称快照',
-    -- 热度数据
     `view_num`    int unsigned NOT NULL DEFAULT '0',
     `collect_num` int unsigned NOT NULL DEFAULT '0',
-
+    `score`      float not null default '0.00',
     `created_at`  timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`  timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at`  timestamp NULL DEFAULT NULL,
+    `embedding`   json NOT Null COMMENT '768维向量数据',
     PRIMARY KEY (`id`),
     KEY           `idx_problem_user` (`problem_id`, `user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='题目推荐贴';

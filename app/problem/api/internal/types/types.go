@@ -21,6 +21,10 @@ type CommonResp struct {
 	Data   interface{} `json:"data",omitempty`
 }
 
+type DeleProblemIdReq struct {
+	Id int64 `json:"id"`
+}
+
 type GetMyPostsReq struct {
 	Page     int64 `form:"page,default=1"`
 	PageSize int64 `form:"page_size,default=20"`
@@ -101,6 +105,14 @@ type PublishReq struct {
 	Title         string  `json:"title"`
 	Content       string  `json:"content"`
 	Solution      string  `json:"solution"`
+}
+
+type RecommendReq struct {
+	Count int `form:"count,default=10"` // 前端可以指定要几条，默认10
+}
+
+type SearchReq struct {
+	Keyword string `form:"keyword"`
 }
 
 type Tag struct {

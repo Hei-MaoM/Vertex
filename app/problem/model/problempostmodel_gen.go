@@ -51,9 +51,11 @@ type (
 		TagsStr    string       `db:"tags_str"`   // Tag名称快照
 		ViewNum    uint64       `db:"view_num"`
 		CollectNum uint64       `db:"collect_num"`
+		Score      float64      `db:"score"`
 		CreatedAt  time.Time    `db:"created_at"`
 		UpdatedAt  time.Time    `db:"updated_at"`
 		DeletedAt  sql.NullTime `db:"deleted_at"`
+		Embedding  string       `db:"embedding"` // 768维向量数据
 	}
 )
 
@@ -93,8 +95,8 @@ func (m *defaultProblemPostModel) FindOne(ctx context.Context, id uint64) (*Prob
 func (m *defaultProblemPostModel) Insert(ctx context.Context, data *ProblemPost) (sql.Result, error) {
 	problemPostIdKey := fmt.Sprintf("%s%v", cacheProblemPostIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, problemPostRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.ProblemId, data.UserId, data.Title, data.Content, data.Solution, data.Status, data.TagsStr, data.ViewNum, data.CollectNum, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, problemPostRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.ProblemId, data.UserId, data.Title, data.Content, data.Solution, data.Status, data.TagsStr, data.ViewNum, data.CollectNum, data.Score, data.DeletedAt, data.Embedding)
 	}, problemPostIdKey)
 	return ret, err
 }
@@ -103,7 +105,7 @@ func (m *defaultProblemPostModel) Update(ctx context.Context, data *ProblemPost)
 	problemPostIdKey := fmt.Sprintf("%s%v", cacheProblemPostIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, problemPostRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.ProblemId, data.UserId, data.Title, data.Content, data.Solution, data.Status, data.TagsStr, data.ViewNum, data.CollectNum, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.ProblemId, data.UserId, data.Title, data.Content, data.Solution, data.Status, data.TagsStr, data.ViewNum, data.CollectNum, data.Score, data.DeletedAt, data.Embedding, data.Id)
 	}, problemPostIdKey)
 	return err
 }

@@ -24,6 +24,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/v1/problem/posts",
 				Handler: ShouOtherPostHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/problem/search",
+				Handler: SearchHandler(serverCtx),
+			},
 		},
 	)
 
@@ -58,6 +63,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/v1/problem/publish",
 				Handler: PublishHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/problem/recommend",
+				Handler: GetRecommendHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,

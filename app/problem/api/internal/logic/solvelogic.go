@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -58,18 +59,25 @@ func (l *SolveLogic) Solve(req *types.ProblemIdReq) (resp *types.CommonResp, err
 		}, nil
 	}
 	tag := strings.Split(pro.TagsStr, ",")
-	for _, res := range tag {
-		ttag, _ := l.svcCtx.TagModel.FindOneByName(l.ctx, res)
-		if _, ok := m[ttag.Category]; !ok {
-			m[ttag.Category] = struct{}{}
-			tags = append(tags, ttag.Category)
-		}
+	if tag != nil {
+		for _, res := range tag {
+			log.Println(res)
+			ttag, _ := l.svcCtx.TagModel.FindOneByName(l.ctx, res)
+			if ttag == nil {
+				continue
+			}
+			if _, ok := m[ttag.Category]; !ok {
+				m[ttag.Category] = struct{}{}
+				tags = append(tags, ttag.Category)
+			}
 
+		}
 	}
+
 	message := map[string]interface{}{
 		"user_id": userId,
 		"action":  "add",
-		"tag":     tags,
+		"tag":     strings.Join(tags, ","),
 	}
 	_, err = l.svcCtx.Redis.XAddCtx(l.ctx, streamKey, false, "*", message)
 	l.svcCtx.ProblemModel.UpdateSolveCount(l.ctx, uint64(problem), 1)
@@ -78,7 +86,6 @@ func (l *SolveLogic) Solve(req *types.ProblemIdReq) (resp *types.CommonResp, err
 	key = fmt.Sprintf("task:ripple:problems")
 	l.svcCtx.Redis.SaddCtx(l.ctx, key, req.Id)
 	key = fmt.Sprintf("active_problem:%d", req.Id)
-	// 每次打卡，给这个题目积攒 1.0 分的活跃值
 	l.svcCtx.Redis.HincrbyFloatCtx(l.ctx, key, "solve", 5.0)
 	return &types.CommonResp{
 		Status: 200,

@@ -27,7 +27,7 @@ func NewDeletePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 	}
 }
 
-func (l *DeletePostLogic) DeletePost(req *types.ProblemIdReq) (resp *types.CommonResp, err error) {
+func (l *DeletePostLogic) DeletePost(req *types.DeleProblemIdReq) (resp *types.CommonResp, err error) {
 	userId, err := l.ctx.Value("id").(json.Number).Int64()
 	if err != nil {
 		return &types.CommonResp{

@@ -42,7 +42,7 @@ export const LeaderboardCard = ({onUserClick}: Props) => {
             <div
                 className="p-4 border-b border-gray-50 flex items-center gap-2 bg-gradient-to-r from-yellow-50 to-white flex-shrink-0">
                 <Trophy className="text-yellow-500" size={18}/>
-                <h3 className="font-bold text-gray-800">解题风云榜</h3>
+                <h3 className="font-bold text-gray-800">收藏榜</h3>
             </div>
 
             {/* List */}

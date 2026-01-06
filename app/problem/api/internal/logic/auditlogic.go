@@ -6,6 +6,7 @@ package logic
 import (
 	"Vertex/pkg/errno"
 	"context"
+	"encoding/json"
 	"strings"
 
 	"Vertex/app/problem/api/internal/svc"
@@ -103,6 +104,13 @@ func (l *AuditLogic) Audit(req *types.AuditReq) (resp *types.CommonResp, err err
 		mergedTagsStr := strings.Join(allTags, ",")
 		problem.TagsStr = mergedTagsStr
 		l.svcCtx.ProblemPostModel.Update(l.ctx, problem)
+		var vec []float64
+
+		if err := json.Unmarshal([]byte(problemPost.Embedding), &vec); err == nil {
+			if len(vec) > 0 {
+				l.svcCtx.VectorIndex.Add(int64(problemPost.Id), vec)
+			}
+		}
 	}
 	return &types.CommonResp{
 		Status: int32(code),

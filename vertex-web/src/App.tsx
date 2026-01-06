@@ -18,7 +18,7 @@ import {ProfilePage} from './components/ProfilePage'; // 我的主页 (复用组
 // === API & Types ===
 import {userApi} from './lib/api';
 import type {CommonResp, User} from './types';
-
+import {SearchResultPage} from './pages/SearchResultPage';
 const Layout = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -35,6 +35,7 @@ const Layout = () => {
     const [auditId, setAuditId] = useState<number | null>(null);
 
     const hasToken = !!localStorage.getItem('jwt_token');
+    const [searchKeyword, setSearchKeyword] = useState("");
 
     const handleRefresh = () => setRefreshTrigger(p => p + 1);
 
@@ -77,7 +78,12 @@ const Layout = () => {
             navigate(`/user/${userId}`);
         }
     };
-
+    const handleSearch = async (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            if (!searchKeyword.trim()) return;
+            navigate(`/search?q=${encodeURIComponent(searchKeyword)}`);
+        }
+    }
     const handleReviewClick = (id: number) => {
         setAuditId(id);
     };
@@ -160,9 +166,18 @@ const Layout = () => {
                             </button>
                         )}
                         <div className="relative hidden sm:block">
-                            <input type="text" placeholder="搜索..." className="pl-9 pr-4 py-1.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 w-64" />
+                            <input
+                                type="text"
+                                placeholder="搜索..."
+                                className="pl-9 pr-4 py-1.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 w-64"
+                                value={searchKeyword}
+                                onChange={(e) => setSearchKeyword(e.target.value)}
+                                // ✨✨✨ 必须加上这一行，否则回车无效 ✨✨✨
+                                onKeyDown={handleSearch}
+                            />
                             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2" />
                         </div>
+
                         {!hasToken && (
                             <button onClick={() => setShowLogin(true)}
                                     className="text-sm font-bold text-gray-600 hover:text-blue-600">
@@ -199,7 +214,7 @@ const Layout = () => {
                         currentUser ? <PublishPage/> :
                             <div className="p-20 text-center text-gray-400">请先登录后发布</div>
                     }/>
-
+                    <Route path="/search" element={<SearchResultPage />} />
                     {/* 4. 我的主页 */}
                     <Route path="/profile" element={
                         <div className="max-w-4xl mx-auto">

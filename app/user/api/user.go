@@ -32,7 +32,7 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	cJob := gitcron.New()
 	job := cron.NewLeaderboardJob(context.Background(), ctx)
-	_, err := cJob.AddFunc("0/01 * * * *", job.Run)
+	_, err := cJob.AddFunc("0/30 * * * *", job.Run)
 	if err != nil {
 		panic(err)
 	}

@@ -10,7 +10,6 @@ import (
 	"Vertex/pkg/errno"
 	"Vertex/pkg/util"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -40,8 +39,11 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 			Error:  "参数有误",
 		}, nil
 	}
+	//log.Println("111")
 	user, err := l.svcCtx.UserModel.FindOneByUsername(l.ctx, req.UserName)
-	fmt.Println(user.Authority)
+	//fmt.Println(user.Authority)
+
+	//log.Println(err.Error())
 	if err != nil {
 		code = errno.ErrorUserNotFound
 		return &types.LoginResp{

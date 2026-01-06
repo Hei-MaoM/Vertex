@@ -37,7 +37,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	//一天一次
+	job2 := cron.NewSimilarityJob(context.Background(), ctx)
+	_, err = cJob.AddFunc("0 3 * * *", job2.Run)
+	if err != nil {
+		panic(err)
+	}
 	cJob.Start()
+	go ctx.VectorIndex.LoadFormDB(ctx.ProblemPostModel)
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
 }

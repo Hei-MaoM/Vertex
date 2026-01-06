@@ -25,6 +25,9 @@ type (
 		UpdateCollectCount(ctx context.Context, uid uint64, delta int) error
 		FindPostsByProblemId(ctx context.Context, problemId int64) ([]*int64, error)
 		UpdateScore(ctx context.Context, id uint64, score float64) error
+		FindRecentIds(ctx context.Context, count int) ([]*int64, error)
+		FindByTag(ctx context.Context, tag string, count int) ([]*int64, error)
+		FindAllEmbeddings(ctx context.Context) ([]*Embeddings, error)
 	}
 
 	customProblemPostModel struct {
@@ -123,4 +126,28 @@ func (m *customProblemPostModel) UpdateScore(ctx context.Context, id uint64, sco
 		return conn.ExecCtx(ctx, query, score, id)
 	})
 	return err
+}
+func (m *customProblemPostModel) FindRecentIds(ctx context.Context, count int) ([]*int64, error) {
+	query := fmt.Sprintf("SELECT id FROM problem_post WHERE status=1 ORDER BY id DESC LIMIT ?")
+	var resp []*int64
+	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, count)
+	return resp, err
+}
+func (m *customProblemPostModel) FindByTag(ctx context.Context, tag string, count int) ([]*int64, error) {
+	query := fmt.Sprintf("SELECT id FROM problem_post WHERE tags_str LIKE ? ORDER BY score DESC LIMIT ?")
+	var resp []*int64
+	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, "%"+tag+"%", count)
+	return resp, err
+}
+
+type Embeddings struct {
+	Id        int64
+	Embedding string
+}
+
+func (m *customProblemPostModel) FindAllEmbeddings(ctx context.Context) ([]*Embeddings, error) {
+	query := fmt.Sprintf("SELECT id,embedding FROM problem_post WHERE status=1")
+	var resp []*Embeddings
+	err := m.CachedConn.QueryRowsNoCacheCtx(ctx, &resp, query)
+	return resp, err
 }

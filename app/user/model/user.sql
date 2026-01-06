@@ -16,7 +16,7 @@ CREATE TABLE `users`
     `deleted_at` timestamp NULL DEFAULT NULL COMMENT '软删除时间',
 
     PRIMARY KEY (`id`),
-    UNIQUE KEY `idx_username` (`username`),      -- 👈 关键：goctl 会生成 FindOneByUsername
-    UNIQUE KEY `idx_email` (`email`),            -- 👈 关键：goctl 会生成 FindOneByEmail
-    KEY          `idx_deleted_at` (`deleted_at`) -- 软删除通常加索引，加快查询非删除数据的速度
+    UNIQUE KEY `idx_username` (`username`),
+    UNIQUE KEY `idx_email` (`email`),
+    KEY          `idx_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';

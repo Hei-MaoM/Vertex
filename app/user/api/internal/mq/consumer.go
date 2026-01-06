@@ -24,7 +24,7 @@ func consumeCollectionEvents(svcCtx *svc.ServiceContext) {
 	streamKey := "stream:collection"
 	groupName := "user_service_group"
 	consumerName := "c1"
-
+	logx.Info("Start consumer collection events")
 	_, err := svcCtx.Redis.XGroupCreateMkStream(streamKey, groupName, "0")
 	if err != nil && err.Error() != "BUSYGROUP Consumer Group name already exists" {
 		logx.Errorf("Create group failed: %v", err)
@@ -66,10 +66,7 @@ func consumeCollectionEvents(svcCtx *svc.ServiceContext) {
 func collectionProcessMessage(svcCtx *svc.ServiceContext, msg *rediss.XMessage) {
 	id, _ := strconv.ParseInt(msg.Values["user_id"].(string), 10, 64)
 	action, _ := msg.Values["action"].(string)
-	catsStr, _ := msg.Values["categories"].(string)
-	if catsStr == "" {
-		return
-	}
+	catsStr, _ := msg.Values["tag"].(string)
 
 	categories := strings.Split(catsStr, ",")
 	var dalta int
@@ -197,11 +194,7 @@ func consumeSolveEvents(svcCtx *svc.ServiceContext) {
 func solveProcessMessage(svcCtx *svc.ServiceContext, msg *rediss.XMessage) {
 	id, _ := strconv.ParseInt(msg.Values["user_id"].(string), 10, 64)
 	action, _ := msg.Values["action"].(string)
-	catsStr, _ := msg.Values["categories"].(string)
-	if catsStr == "" {
-		return
-	}
-
+	catsStr, _ := msg.Values["tag"].(string)
 	categories := strings.Split(catsStr, ",")
 	var dalta int
 	if action == "add" {

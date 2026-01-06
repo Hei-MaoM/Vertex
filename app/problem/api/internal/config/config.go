@@ -20,4 +20,9 @@ type Config struct {
 		AccessSecret string
 		AccessExpire int64
 	}
+	ZhipuAi struct {
+		Apikey    string
+		EmbedUrl  string
+		ModelName string
+	}
 }

@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -84,22 +85,32 @@ func (l *CollectLogic) Collect(req *types.CollectReq) (resp *types.CommonResp, e
 		}, nil
 	}
 	tag := strings.Split(problem.TagsStr, ",")
-	for _, res := range tag {
-		ttag, _ := l.svcCtx.TagModel.FindOneByName(l.ctx, res)
-		if _, ok := m[ttag.Category]; !ok {
-			m[ttag.Category] = struct{}{}
-			tags = append(tags, ttag.Category)
-		}
+	//log.Println(tag)
+	if tag != nil {
+		for _, res := range tag {
+			ttag, _ := l.svcCtx.TagModel.FindOneByName(l.ctx, res)
+			if ttag == nil {
+				continue
+			}
+			if _, ok := m[ttag.Category]; !ok {
+				m[ttag.Category] = struct{}{}
+				tags = append(tags, ttag.Category)
+			}
 
+		}
 	}
+
 	message := map[string]interface{}{
 		"user_id": problem.UserId,
 		"action":  req.Action, // "add" or "remove"
-		"tag":     tags,
+		"tag":     strings.Join(tags, ","),
 	}
 	_, err = l.svcCtx.Redis.XAddCtx(l.ctx, streamKey, false, "*", message)
 	key := fmt.Sprintf("problem:score:%d", req.Id)
-	l.svcCtx.Redis.HincrbyFloatCtx(l.ctx, key, "collect", 10.0)
+	_, err = l.svcCtx.Redis.HincrbyFloatCtx(l.ctx, key, "collect", 10.0)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return &types.CommonResp{
 		Status: 200,
 		Msg:    "ok",

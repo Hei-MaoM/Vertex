@@ -51,7 +51,6 @@ type (
 		TagsStr     string       `db:"tags_str"`    // Tag名称快照
 		SolveNum    uint64       `db:"solve_num"`
 		CollectNum  uint64       `db:"collect_num"`
-		Score       float64      `db:"score"` // 综合热度分
 		CreatedAt   time.Time    `db:"created_at"`
 		UpdatedAt   time.Time    `db:"updated_at"`
 		DeletedAt   sql.NullTime `db:"deleted_at"`
@@ -121,8 +120,8 @@ func (m *defaultProblemModel) Insert(ctx context.Context, data *Problem) (sql.Re
 	problemIdKey := fmt.Sprintf("%s%v", cacheProblemIdPrefix, data.Id)
 	problemUrlKey := fmt.Sprintf("%s%v", cacheProblemUrlPrefix, data.Url)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, problemRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.Title, data.Source, data.Url, data.Description, data.TagsStr, data.SolveNum, data.CollectNum, data.Score, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, problemRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.Title, data.Source, data.Url, data.Description, data.TagsStr, data.SolveNum, data.CollectNum, data.DeletedAt)
 	}, problemIdKey, problemUrlKey)
 	return ret, err
 }
@@ -137,7 +136,7 @@ func (m *defaultProblemModel) Update(ctx context.Context, newData *Problem) erro
 	problemUrlKey := fmt.Sprintf("%s%v", cacheProblemUrlPrefix, data.Url)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, problemRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.Title, newData.Source, newData.Url, newData.Description, newData.TagsStr, newData.SolveNum, newData.CollectNum, newData.Score, newData.DeletedAt, newData.Id)
+		return conn.ExecCtx(ctx, query, newData.Title, newData.Source, newData.Url, newData.Description, newData.TagsStr, newData.SolveNum, newData.CollectNum, newData.DeletedAt, newData.Id)
 	}, problemIdKey, problemUrlKey)
 	return err
 }

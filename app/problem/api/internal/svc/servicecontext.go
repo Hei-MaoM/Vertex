@@ -6,6 +6,7 @@ package svc
 import (
 	"Vertex/app/problem/api/internal/config"
 	"Vertex/app/problem/api/internal/middleware"
+	"Vertex/app/problem/api/internal/pkg"
 	"Vertex/app/problem/model"
 
 	"github.com/zeromicro/go-zero/core/stores/redis"
@@ -23,6 +24,8 @@ type ServiceContext struct {
 	ProblemTagModel  model.ProblemTagModel
 	UserCollectModel model.UserCollectModel
 	UserSolvedModel  model.UserSolvedModel
+	ZhipuClient      *pkg.Client
+	VectorIndex      *VectorIndex
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -39,5 +42,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UserCollectModel: model.NewUserCollectModel(conn, c.CacheRedis),
 		UserSolvedModel:  model.NewUserSolvedModel(conn, c.CacheRedis),
 		AdminCheck:       middleware.NewAdminCheckMiddleware().Handle,
+		ZhipuClient: pkg.NewClient(
+			c.ZhipuAi.Apikey,
+			c.ZhipuAi.EmbedUrl,
+			c.ZhipuAi.ModelName,
+		),
+		VectorIndex: NewVectorIndex(),
 	}
 }

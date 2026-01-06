@@ -16,6 +16,7 @@ type (
 	TagModel interface {
 		tagModel
 		FindAll(ctx context.Context) ([]*Tag, error)
+		FindByCategory(ctx context.Context, category string) ([]*string, error)
 	}
 
 	customTagModel struct {
@@ -33,5 +34,12 @@ func (m *customTagModel) FindAll(ctx context.Context) ([]*Tag, error) {
 	var tags []*Tag
 	query := fmt.Sprintf("SELECT %s FROM %s ORDER BY category, id", tagRows, m.table)
 	err := m.QueryRowsNoCacheCtx(ctx, &tags, query)
+	return tags, err
+}
+
+func (m *customTagModel) FindByCategory(ctx context.Context, category string) ([]*string, error) {
+	query := fmt.Sprintf("SELECT name FROM %s Where category = ?", m.table)
+	var tags []*string
+	err := m.QueryRowsNoCacheCtx(ctx, &tags, query, category)
 	return tags, err
 }

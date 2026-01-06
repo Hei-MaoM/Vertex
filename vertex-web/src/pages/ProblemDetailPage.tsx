@@ -45,7 +45,14 @@ export const ProblemDetailPage = () => {
                     setIsCollected(collectRes.data.data);
                 }
             } catch (err: any) {
-                setError(err.message || "加载失败");
+                if (err.response?.status === 401) {
+                    // 方案 A: 简单提示
+                    setError("请先登录后查看详情");
+                    // 方案 B: 如果 App 传了 onShowLogin 回调，可以在这里调用
+                    // 但现在我们没有传，所以只能显示错误信息
+                } else {
+                    setError(err.message || err.response?.data?.msg || "获取数据失败");
+                }
             } finally {
                 setLoading(false);
             }
@@ -80,7 +87,7 @@ export const ProblemDetailPage = () => {
             // @ts-ignore
             const res = await problemApi.post<CommonResp>('/v1/problem/solve', {
                 id: detail?.problem_id,
-                pid: number(id)
+                pid: Number(id)
             });
             if (res.data.status === 0 || res.data.status === 200) {
                 alert("打卡成功！");
